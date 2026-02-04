@@ -1,26 +1,74 @@
+
 <script>
   import { onMount } from 'svelte'
   import { SVG } from '@svgdotjs/svg.js'
+  import { createLineTool } from '$lib/tools/lineTool'
+  import { createhLineTool } from '$lib/tools/hlineTool'
+
+  import { circleCenter } from '$lib/circleStore.js'
 
   let container
+  let draw
+  let activeTool = null
 
   onMount(() => {
-    const draw = SVG().addTo(container).size(500, 500)
+    draw = SVG().addTo(container).size(container.clientWidth, container.clientHeight)
 
-        draw.on("click", (e) => {
-        const point = draw.node.createSVGPoint()
-        point.x = e.clientX
-        point.y = e.clientY
+    // create unit circle
+    const centerX = container.clientWidth / 2
+    const centerY = container.clientHeight / 2
+    const diameter = container.clientHeight / 2
+    const radius = diameter / 2
 
-        const svgCoords = point.matrixTransform(
-            draw.node.getScreenCTM().inverse()
-        )
+    draw.circle(diameter) // diameter
+        .center(centerX, centerY)
+        .fill('none')
+        .stroke({ width: 2, color: '#000' })
 
-        console.log(svgCoords.x, svgCoords.y)
-        })
+    circleCenter.set({ x: centerX, y: centerY , r: radius})
+
+    draw.on("click", (e) => {
+      console.log("active tool:", activeTool)
+      
+      if (!activeTool) return
+      const pt = draw.node.createSVGPoint()
+      pt.x = e.clientX
+      pt.y = e.clientY
+      const svgCoords = pt.matrixTransform(
+        draw.node.getScreenCTM().inverse()
+      )
+      activeTool.onClick(svgCoords)
+    })
+
+    window.addEventListener('resize', updateSize)
+
+    return () => window.removeEventListener('resize', updateSize)
   })
 
-  onMount
+  function useLineTool() {
+    activeTool?.reset()
+    activeTool = createLineTool(draw)
+  }
+
+  function usehLineTool(){
+    activeTool?.reset()
+    activeTool = createhLineTool(draw)
+  }
+
+  function updateSize() {
+    if (draw && container) draw.size(container.clientWidth, container.clientHeight)
+  }
+
 </script>
 
-<div bind:this={container}></div>
+<button on:click={useLineTool}>
+  Draw Line
+</button>
+
+<button on:click={usehLineTool}>
+  Draw Hyperbolic Line
+</button>
+
+<div bind:this={container} style="width: 100vw; height: 100vh;"></div>
+
+

@@ -9,7 +9,9 @@
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"test": "vitest",
+		"test:watch": "vitest"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.1",
@@ -25,7 +27,8 @@
 		"prettier": "^3.8.1",
 		"prettier-plugin-svelte": "^3.4.1",
 		"svelte": "^5.48.2",
-		"vite": "^7.3.1"
+		"vite": "^7.3.1",
+		"vitest": "^4.0.18"
 	},
 	"dependencies": {
 		"@svgdotjs/svg.js": "^3.2.5"

@@ -19,3 +19,6 @@ figure out how to
     only select points inside of circle
     only show inside of circle
     
+# testing
+npm install -D vitest
+npm test

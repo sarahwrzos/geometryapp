@@ -4,6 +4,7 @@
   import { SVG } from '@svgdotjs/svg.js'
 
 	import { Shapes } from '$lib/geometry/Shapes';
+  import { Point } from '$lib/geometry/Point.js';
 
   let container
   let draw
@@ -16,6 +17,24 @@
     pt.x = event.clientX
     pt.y = event.clientY
     return pt.matrixTransform(draw.node.getScreenCTM().inverse())
+  }
+
+  // for testing
+  function addDiameterLine() {
+    const r = shapes.unitCircleRadius;
+    const cx = shapes.unitCircleCenter.x;
+    const cy = shapes.unitCircleCenter.y;
+
+    // Points along a horizontal diameter
+    const left = new Point(cx, cy);
+    const right = new Point(cx + 20, cy+1);
+
+    shapes.addPoint(cx, cy)
+    shapes.addPoint(cx + 20, cy+1)
+
+    const dline = shapes.addLine(left, right);
+
+    // console.log(dline.isDiameter)
   }
 
   onMount(() => {
@@ -33,6 +52,11 @@
         .stroke({ width: 2, color: '#000' })
 
     shapes = new Shapes(centerX, centerY, radius)
+
+    addDiameterLine()
+    console.log(shapes.points)
+    shapes.drawAll(draw)
+
     let tempPoint = null
 
     draw.on("click", (event) => {

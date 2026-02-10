@@ -5,11 +5,13 @@
 
 	import { Shapes } from '$lib/geometry/Shapes';
   import { Point } from '$lib/geometry/Point.js';
+  import { DiskHyperbolicLine } from '$lib/geometry/DiskHyperbolicLine.js';
 
   let container
   let draw
   let activeTool = null
   let shapes
+  let tempPoint = null
 
   // Function to get x,y coordinates of click relative to SVG
   function getClickCoords(event) {
@@ -32,9 +34,14 @@
     shapes.addPoint(cx, cy)
     shapes.addPoint(cx + 20, cy+1)
 
-    const dline = shapes.addLine(left, right);
+    const dline = shapes.addClickableLine(left, right);
 
     // console.log(dline.isDiameter)
+  }
+
+  function startHyperbolicLineTool() {
+    activeTool = 'hyperbolicLine';
+    tempPoint = null; // reset first click
   }
 
   onMount(() => {
@@ -46,6 +53,8 @@
     const diameter = container.clientHeight / 2
     const radius = diameter / 2
 
+    const unitCircle = new Point(centerX, centerY)
+
     draw.circle(diameter)
         .center(centerX, centerY)
         .fill('none')
@@ -53,61 +62,44 @@
 
     shapes = new Shapes(centerX, centerY, radius)
 
-    addDiameterLine()
-    console.log(shapes.points)
+    // addDiameterLine()
+    // console.log(shapes.points)
     shapes.drawAll(draw)
 
-    let tempPoint = null
+    // Example: initial line
+    // shapes.addClickableLine(
+    //   new Point(centerX - 50, centerY),
+    //   new Point(centerX + 50, centerY),
+    //   draw
+    // );
 
-    draw.on("click", (event) => {
-      const coords = getClickCoords(event);
-      const point = shapes.addPoint(coords.x, coords.y);
+    draw.on('click', (event) => {
+      const coords = getClickCoords(event)
+      const point = shapes.addPoint(coords.x, coords.y)
 
-      if (tempPoint === null) {
-        tempPoint = point; // store the Point object
-      } else {
-        shapes.addLine(tempPoint, point); // pass Point objects
-        tempPoint = null;
+      if (activeTool === 'hyperbolicLine') {
+        // Use two clicks to create a hyperbolic line
+        if (tempPoint === null) {
+          tempPoint = point
+        } else {
+          shapes.addClickableLine(tempPoint, point, draw)
+          tempPoint = null
+          activeTool = null  // optionally deactivate tool after one line
+        }
       }
 
-      // Draw all points and lines
-      draw.clear();
-      draw.circle(diameter)
-          .center(centerX, centerY)
-          .fill('none')
-          .stroke({ width: 2, color: '#000' });
-
-      shapes.drawAll(draw);
-
-      console.log(coords.x, coords.y); 
-      console.log(shapes.lines)
     });
 
-
-
-  //   draw.on("click", (e) => {
-  //     console.log("active tool:", activeTool)
-      
-  //     if (!activeTool) return
-  //     const pt = draw.node.createSVGPoint()
-  //     pt.x = e.clientX
-  //     pt.y = e.clientY
-  //     const svgCoords = pt.matrixTransform(
-  //       draw.node.getScreenCTM().inverse()
-  //     )
-  //     activeTool.onClick(svgCoords)
-  //   })
-
-  //   window.addEventListener('resize', updateSize)
-
-  //   return () => window.removeEventListener('resize', updateSize)
   })
 
-  // function updateSize() {
-  //   if (draw && container) draw.size(container.clientWidth, container.clientHeight)
-  // }
 
 </script>
+
+<div style="margin: 1em;">
+  <button on:click={startHyperbolicLineTool}>
+    Draw Hyperbolic Line
+  </button>
+</div>
 
 <div bind:this={container} style="width: 100vw; height: 100vh;"></div>
 

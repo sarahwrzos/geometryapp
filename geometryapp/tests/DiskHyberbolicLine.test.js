@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
-import { Point } from '../src/lib/geometry/Point.js';
-import { DiskHyperbolicLine } from '../src/lib/geometry/DiskHyperbolicLine.js';
+import { Point } from '../src/lib/geometry/PointView.js';
+import { DiskHyperbolicLine } from '../src/lib/geometry/DiskLineModel.js';
 
 describe('DiskHyperbolicLine', () => {
 

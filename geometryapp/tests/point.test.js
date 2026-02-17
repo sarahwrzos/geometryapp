@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 
-import { Point } from "../src/lib/geometry/Point.js";
+import { Point } from "../src/lib/geometry/PointView.js";
 
 describe("Point", () => {
 

@@ -155,8 +155,12 @@
     console.log("Loaded construction:", name);
   }
 
-  function switchModel() {
-    
+  function switchToDisk() {
+    sceneView.switchModel("Disk");
+  }
+
+  function switchToHalfPlane() {
+    sceneView.switchModel("HalfPlane");
   }
 
   onMount(() => {
@@ -216,7 +220,8 @@
   <button on:click={loadConstruction}>Load</button>
   <button on:click={startHyperbolicLineTool}>Draw Hyperbolic Line</button>
   <button on:click={startPointTool}>Draw Point</button>
-  <button on:click={switchModel}>Switch Model</button>
+  <button on:click={switchToDisk}>Switch to Poincare Disk Model</button>
+  <button on:click={switchToHalfPlane}>Switch to Upper Half Plane Model</button>
 </div>
 
 <div bind:this={container} style="width: 100vw; height: calc(100vh - 50px); margin-top: 50px;"></div>

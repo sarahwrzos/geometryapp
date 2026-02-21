@@ -14,6 +14,7 @@
   let draw;
   let sceneModel;
   let sceneView;
+  let saveName = 'default';
 
   let activeTool = null;
   let tempPoint = null;
@@ -59,18 +60,32 @@
 
       addButton(e.clientX, e.clientY, 'Remove', () => {
         lineView.element.remove();
-        const index = sceneModel.lines.indexOf(lineView.model);
-        if (index > -1) sceneModel.lines.splice(index, 1);
+        sceneModel.removeLine(lineView.model);
+        
+        // remove the two points
+        lineView.model.p1.view?.element.remove();
+        lineView.model.p2.view?.element.remove();
+
+        // remove action buttons
+        document.querySelectorAll('button.line-action')
+        .forEach(b => b.remove());
       }).classList.add('line-action');
 
       addButton(e.clientX + 60, e.clientY, 'Color', () => {
         const newColor = prompt('Enter color (e.g., red or #00ff00):', 'black');
-        if (newColor) lineView.element.stroke({ color: newColor });
+        if (newColor) {
+          lineView.model.color = newColor;
+          lineView.element.stroke({ color: newColor });
+        }
+
+        // remove action buttons
+        document.querySelectorAll('button.line-action')
+        .forEach(b => b.remove());
       }).classList.add('line-action');
     });
 
     lineView.element.on('mouseover', () => lineView.element.stroke({ color: 'red' }));
-    lineView.element.on('mouseout', () => lineView.element.stroke({ color: 'black' }));
+    lineView.element.on('mouseout', () => lineView.element.stroke({ color: lineView.model.color }));
   }
 
   function drawLine(lineModel) {
@@ -78,6 +93,66 @@
     lineView.draw();
     makeLineActions(lineView);
     sceneView.lineViews.push(lineView);
+  }
+
+  function saveConstruction(name) {
+    const pointIndexMap = new Map();
+
+    sceneModel.points.forEach((p, i) => {
+      pointIndexMap.set(p, i);
+    });
+
+    const data = {
+      points: sceneModel.points.map(p => p.toJSON()),
+      lines: sceneModel.lines.map(l => ({
+        p1: pointIndexMap.get(l.p1),
+        p2: pointIndexMap.get(l.p2),
+        color: l.color
+      }))
+    };
+
+    localStorage.setItem(name, JSON.stringify(data));
+    console.log("Saved construction:", name);
+  }
+
+  function loadConstruction(name, unitCircleCenter, unitCircleRadius) {
+    const json = localStorage.getItem(name);
+    if (!json) return;
+
+    const data = JSON.parse(json);
+
+    // Clear existing scene
+    sceneModel.clear();
+    sceneView.pointViews.forEach(v => v.element.remove());
+    sceneView.lineViews.forEach(v => v.element.remove());
+    sceneView.pointViews = [];
+    sceneView.lineViews = [];
+
+    // Restore points
+    const points = data.points.map(pData => {
+      const pt = sceneModel.addPoint(pData.x, pData.y);
+      const view = new PointView(pt, draw);
+      view.draw();
+      view.enableDrag();
+      sceneView.pointViews.push(view);
+      return pt;
+    });
+
+    // Restore lines
+    data.lines.forEach(lData => {
+      const lineModel = sceneModel.addLine(
+        points[lData.p1],
+        points[lData.p2]
+      );
+      lineModel.color = lData.color || "black";
+
+      const lineView = new DiskLineView(lineModel, draw, sceneView, lineModel.color);
+      lineView.draw();
+      makeLineActions(lineView);
+      sceneView.lineViews.push(lineView);
+    });
+
+    console.log("Loaded construction:", name);
   }
 
   onMount(() => {
@@ -129,16 +204,19 @@
           const lineModel = sceneModel.addLine(tempPoint, pointModel);
           drawLine(lineModel);
           tempPoint = null;
-          activeTool = null; // optional: deactivate after one line
+          activeTool = null; // deactivate after one line
         }
       }
     });
   });
 </script>
 
-<div style="margin: 1em;">
+<div style="position: absolute; top: 10px; left: 10px; z-index: 1000;">
+  <input bind:value={saveName} placeholder="Save name" />
+  <button on:click={saveConstruction}>Save</button>
+  <button on:click={loadConstruction}>Load</button>
   <button on:click={startHyperbolicLineTool}>Draw Hyperbolic Line</button>
   <button on:click={startPointTool}>Draw Point</button>
 </div>
 
-<div bind:this={container} style="width: 100vw; height: 100vh;"></div>
+<div bind:this={container} style="width: 100vw; height: calc(100vh - 50px); margin-top: 50px;"></div>

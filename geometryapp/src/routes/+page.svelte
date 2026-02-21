@@ -165,10 +165,10 @@
     const diameter = container.clientHeight / 2;
     const radius = diameter / 2;
 
-    draw.circle(diameter)
-        .center(centerX, centerY)
-        .fill('none')
-        .stroke({ width: 2, color: '#000' });
+    // draw.circle(diameter)
+    //     .center(centerX, centerY)
+    //     .fill('none')
+    //     .stroke({ width: 2, color: '#000' });
 
     // Initialize SceneModel and SceneView
     sceneModel = new SceneModel(centerX, centerY, radius);

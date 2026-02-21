@@ -22,3 +22,5 @@ figure out how to
 # testing
 npm install -D vitest
 npm test
+
+npm install mathjs

@@ -3,7 +3,7 @@ import { DiskLineModel } from "$lib/geometry/DiskLineModel.js";
 import { HalfPlaneLineModel } from "./HalfPlaneLineModel";
 
 export class SceneModel {
-    constructor(uccx, uccy, uccr, sceneType = "disk") {
+    constructor(uccx, uccy, uccr, sceneType = "Disk") {
         this.unitCircleCenter = new PointModel(uccx, uccy);
         this.unitCircleCenterX = uccx;
         this.unitCircleCenterY = uccy;
@@ -21,7 +21,9 @@ export class SceneModel {
     }
 
     addLine(p1, p2) {
-        if (this.sceneType === "disk") {
+        console.log(this.sceneType)
+        if (this.sceneType === "Disk") {
+            console.log("line")
             const line = new DiskLineModel(
                 p1,
                 p2,

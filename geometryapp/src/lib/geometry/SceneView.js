@@ -11,9 +11,11 @@ export class SceneView {
 
     setup() {
         // test
+        console.log(this.sceneModel.sceneType)
         if (this.sceneModel.sceneType === "Disk"){
             //draw unit circle
             //todo clear? draw existing points?
+            console.log("in disk")
             this.baseElement = this.svg.circle(this.sceneModel.unitCircleRadius * 2)
             .center(this.sceneModel.unitCircleCenterX, this.sceneModel.unitCircleCenterY)
             .fill('none')
@@ -61,7 +63,7 @@ export class SceneView {
         });
 
         // Draw all lines
-        if (this.sceneModel.sceneType === "disk") {
+        if (this.sceneModel.sceneType === "Disk") {
             this.sceneModel.lines.forEach(lineModel => {
                 const view = new LineView(lineModel, this.svg);
                 view.draw();

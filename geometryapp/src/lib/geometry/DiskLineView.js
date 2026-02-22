@@ -22,12 +22,11 @@ export class DiskLineView {
             ).stroke({ width: this.width, color: this.model.color });
         } else {
             // Arc / placeholder circle
-            console.log(this.model.radius, this.model.center.x)
-             this.element = this.svg.circle()
-            .radius(this.model.radius)
+            console.log(this.model.radius, this.model.center.x, this.isDiameter)
+             this.element = this.svg.circle(this.model.radius * 2)
             .center(this.model.center.x, this.model.center.y)
             .fill('none')
-            .stroke({ width: this.width, color: this.color });
+            .stroke({ width: this.width, color: this.model.color });
 
         }
 
@@ -45,8 +44,8 @@ export class DiskLineView {
         if (this.model.isDiameter) {
             this.element.plot([this.model.p1.x, this.model.p1.y, this.model.p2.x, this.model.p2.y]);
         } else {
-            this.element.cx(this.model.center.x).cy(this.model.center.y);
-            this.element.radius(this.model.radius);
+            this.element.size(this.model.radius * 2)
+                .center(this.model.center.x, this.model.center.y);
         }
     }
 

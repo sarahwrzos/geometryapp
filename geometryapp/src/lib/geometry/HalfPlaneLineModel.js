@@ -56,44 +56,44 @@ export class HalfPlaneLineModel {
         }
     }
 
-    findIntersection(otherLine) {
-        //todo: check to make sure it works with this model
-        const EPS = 1e-9;
-        const ucx = this.unitCircleCenter.x;
-        const ucy = this.unitCircleCenter.y;
-        const ur  = this.unitCircleRadius;
+    // findIntersection(otherLine) {
+    //     //todo: check to make sure it works with this model
+    //     const EPS = 1e-9;
+    //     const ucx = this.unitCircleCenter.x;
+    //     const ucy = this.unitCircleCenter.y;
+    //     const ur  = this.unitCircleRadius;
 
-        if (this.isDiameter === 1 && otherLine.isDiameter === 1) {
-            return new PointModel(ucx, ucy);
-        }
+    //     if (this.isDiameter === 1 && otherLine.isDiameter === 1) {
+    //         return new PointModel(ucx, ucy);
+    //     }
 
-    }
+    // }
 
-    calcAngle(otherLine, intersectionPoint) {
-        let v1, v2;
+    // calcAngle(otherLine, intersectionPoint) {
+    //     let v1, v2;
 
-        if (this.isDiameter === 1) {
-            v1 = { x: this.p2.x - this.p1.x, y: this.p2.y - this.p1.y };
-        } else {
-            const rx = intersectionPoint.x - this.center.x;
-            const ry = intersectionPoint.y - this.center.y;
-            v1 = { x: -ry, y: rx };
-        }
+    //     if (this.isDiameter === 1) {
+    //         v1 = { x: this.p2.x - this.p1.x, y: this.p2.y - this.p1.y };
+    //     } else {
+    //         const rx = intersectionPoint.x - this.center.x;
+    //         const ry = intersectionPoint.y - this.center.y;
+    //         v1 = { x: -ry, y: rx };
+    //     }
 
-        if (otherLine.isDiameter === 1) {
-            v2 = { x: otherLine.p2.x - otherLine.p1.x, y: otherLine.p2.y - otherLine.p1.y };
-        } else {
-            const rx = intersectionPoint.x - otherLine.center.x;
-            const ry = intersectionPoint.y - otherLine.center.y;
-            v2 = { x: -ry, y: rx };
-        }
+    //     if (otherLine.isDiameter === 1) {
+    //         v2 = { x: otherLine.p2.x - otherLine.p1.x, y: otherLine.p2.y - otherLine.p1.y };
+    //     } else {
+    //         const rx = intersectionPoint.x - otherLine.center.x;
+    //         const ry = intersectionPoint.y - otherLine.center.y;
+    //         v2 = { x: -ry, y: rx };
+    //     }
 
-        const dot = v1.x*v2.x + v1.y*v2.y;
-        const mag1 = Math.hypot(v1.x, v1.y);
-        const mag2 = Math.hypot(v2.x, v2.y);
-        const cosTheta = Math.max(-1, Math.min(1, dot / (mag1*mag2)));
-        return Math.acos(cosTheta);
-    }
+    //     const dot = v1.x*v2.x + v1.y*v2.y;
+    //     const mag1 = Math.hypot(v1.x, v1.y);
+    //     const mag2 = Math.hypot(v2.x, v2.y);
+    //     const cosTheta = Math.max(-1, Math.min(1, dot / (mag1*mag2)));
+    //     return Math.acos(cosTheta);
+    // }
 
     toJSON(pointIndexMap) {
         return {

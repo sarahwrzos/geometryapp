@@ -21,9 +21,7 @@ export class SceneModel {
     }
 
     addLine(p1, p2) {
-        console.log(this.sceneType)
         if (this.sceneType === "Disk") {
-            console.log("line")
             const line = new DiskLineModel(
                 p1,
                 p2,

@@ -12,39 +12,54 @@ export class HalfPlaneLineView {
     }
 
     draw() {
+        console.log("here")
         if (!this.svg) return;
 
         if (this.element) this.element.remove();
-
-        if (this.model.isDiameter) {
+        console.log("here")
+        if (this.model.isVertical) {
+            // Vertical Euclidean line
             this.element = this.svg.line(
-                [this.model.p1.x, this.model.p1.y, this.model.p2.x, this.model.p2.y]
+                this.model.x, 0,
+                this.model.x, this.svg.height()
             ).stroke({ width: this.width, color: this.model.color });
+
         } else {
-            // Arc / placeholder circle
-            this.element = this.svg.circle(this.model.radius * 2)
-                .cx(this.model.center.x)
-                .cy(this.model.center.y)
+            // Semicircle orthogonal to boundary
+            const diameter = this.model.radius * 2;
+
+            this.element = this.svg.circle(diameter)
+                .center(this.model.center.x, this.model.center.y)
                 .fill('none')
-                .stroke({ width: this.width, color: this.color });
+                .stroke({ width: this.width, color: this.model.color });
+
+            // Clip to upper half-plane only
+            this.element.clipWith(this.sceneView.halfPlaneClip);
         }
 
-        // Apply the clip
-        if (this.sceneView?.unitCircleClip) {
-            this.element.clipWith(this.sceneView.unitCircleClip);
-        }
-        // this.enableHover();
         return this.element;
     }
 
     update() {
         if (!this.element) return;
 
-        if (this.model.isDiameter) {
-            this.element.plot([this.model.p1.x, this.model.p1.y, this.model.p2.x, this.model.p2.y]);
+        // HALF-PLANE MODE
+        if (this.model.isVertical) {
+
+            // Update vertical line
+            this.element.plot(
+                this.model.x, 0,
+                this.model.x, this.svg.height()
+            );
+
         } else {
-            this.element.cx(this.model.center.x).cy(this.model.center.y);
-            this.element.radius(this.model.radius);
+
+            // Update semicircle
+            const diameter = this.model.radius * 2;
+
+            this.element
+                .size(diameter) // sets width + height
+                .center(this.model.center.x, this.model.center.y);
         }
     }
 

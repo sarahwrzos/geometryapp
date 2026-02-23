@@ -9,6 +9,7 @@
   import { PointView } from '$lib/geometry/PointView.js';
   import { DiskLineModel } from '$lib/geometry/DiskLineModel.js';
   import { DiskLineView } from '$lib/geometry/DiskLineView.js';
+   import { HalfPlaneLineView } from '$lib/geometry/HalfPlaneLineView.js';
 
   let container;
   let draw;
@@ -89,10 +90,18 @@
   }
 
   function drawLine(lineModel) {
-    const lineView = new DiskLineView(lineModel, draw, sceneView);
-    lineView.draw();
-    makeLineActions(lineView);
-    sceneView.lineViews.push(lineView);
+    if (sceneView.sceneModel.sceneType === "Disk"){
+      const lineView = new DiskLineView(lineModel, draw, sceneView);
+      lineView.draw();
+      makeLineActions(lineView);
+      sceneView.lineViews.push(lineView);
+    }
+    else{
+      const lineView = new HalfPlaneLineView(lineModel, draw, sceneView);
+      lineView.draw();
+      makeLineActions(lineView);
+      sceneView.lineViews.push(lineView);
+    }
   }
 
   function saveConstruction(name) {

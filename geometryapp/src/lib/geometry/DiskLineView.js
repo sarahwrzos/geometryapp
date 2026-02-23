@@ -22,8 +22,7 @@ export class DiskLineView {
             ).stroke({ width: this.width, color: this.model.color });
         } else {
             // Arc / placeholder circle
-            console.log(this.model.radius, this.model.center.x, this.isDiameter)
-             this.element = this.svg.circle(this.model.radius * 2)
+            this.element = this.svg.circle(this.model.radius * 2)
             .center(this.model.center.x, this.model.center.y)
             .fill('none')
             .stroke({ width: this.width, color: this.model.color });

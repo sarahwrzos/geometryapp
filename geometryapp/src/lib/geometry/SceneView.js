@@ -1,3 +1,6 @@
+import { PointModel } from "$lib/geometry/PointModel.js";
+import { PointView } from "$lib/geometry/PointView.js";
+
 export class SceneView {
     constructor(sceneModel, svg) {
         this.sceneModel = sceneModel;
@@ -11,11 +14,9 @@ export class SceneView {
 
     setup() {
         // test
-        console.log(this.sceneModel.sceneType)
         if (this.sceneModel.sceneType === "Disk"){
             //draw unit circle
             //todo clear? draw existing points?
-            console.log("in disk")
             this.baseElement = this.svg.circle(this.sceneModel.unitCircleRadius * 2)
             .center(this.sceneModel.unitCircleCenterX, this.sceneModel.unitCircleCenterY)
             .fill('none')
@@ -34,23 +35,16 @@ export class SceneView {
     }
 
     switchModel(newType) {
-        if (this.sceneModel.sceneType === newType){
-            // no changes needed
-            return;
-        }
-        else if (newType === "Disk"){
-            // half plane to disk
-            //transform all points, call setup()
-            this.baseElement.remove();
-            this.sceneModel.sceneType = "Disk"
-            this.setup();
-        }
-        else{
-            // disk to half plane
-            this.baseElement.remove();
-            this.sceneModel.sceneType = "HalfPlane"
-            this.setup();
-        }
+        if (this.sceneModel.sceneType === newType) return;
+
+        // Remove all visuals
+        this.clear();
+        this.baseElement.remove();
+
+        this.sceneModel.sceneType = newType;
+
+        this.setup();
+        this.render();
     }
 
     render() {

@@ -34,25 +34,38 @@ export class HalfPlaneLineModel {
         this.listeners.forEach(fn => fn());
     }
 
-    computeGeodesic(y0 = 0) {
+    computeGeodesic() {
         const x1 = this.p1.x;
         const y1 = this.p1.y;
         const x2 = this.p2.x;
         const y2 = this.p2.y;
 
+        const pageHeight = this.unitCircleCenter.y * 2;
+        const y0 = (2/3) * pageHeight;
+
         // Check for vertical line
         if (Math.abs(x1 - x2) < 1e-9) {
+
+            //todo vertical not working
             this.isVertical = true;
             this.center = null;
             this.radius = null;
             this.x = x1;   // vertical line x-coordinate
         } else {
+            console.log("set")
             this.isVertical = false;
-            // Center along the axis y = y0
-            this.center = (x1**2 + (y1 - y0)**2 - x2**2 - (y2 - y0)**2) / (2 * (x1 - x2));
-            // Radius
-            this.radius = Math.sqrt((x1 - this.center)**2 + (y1 - y0)**2);
-            this.axisY = y0;  // store axis location for drawing
+
+            // Compute center x-coordinate
+            const cx = (x1**2 + (y1 - y0)**2 - x2**2 - (y2 - y0)**2) 
+                    / (2 * (x1 - x2));
+
+            // Store center as full point
+            this.center = { x: cx, y: y0 };
+
+            // Compute radius
+            this.radius = Math.sqrt(
+                (x1 - cx)**2 + (y1 - y0)**2
+            );
         }
     }
 

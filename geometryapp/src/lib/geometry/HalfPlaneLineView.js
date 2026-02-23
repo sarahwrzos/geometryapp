@@ -26,15 +26,16 @@ export class HalfPlaneLineView {
 
         } else {
             // Semicircle orthogonal to boundary
+            
             const diameter = this.model.radius * 2;
-
+            console.log(diameter, this.model.center.x,this.model.center.y)
             this.element = this.svg.circle(diameter)
                 .center(this.model.center.x, this.model.center.y)
                 .fill('none')
                 .stroke({ width: this.width, color: this.model.color });
 
             // Clip to upper half-plane only
-            this.element.clipWith(this.sceneView.halfPlaneClip);
+            //this.element.clipWith(this.sceneView.halfPlaneClip);
         }
 
         return this.element;

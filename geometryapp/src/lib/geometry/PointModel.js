@@ -1,4 +1,5 @@
 // PointModel.js
+import * as math from 'mathjs';
 
 export class PointModel{
     constructor(x, y, unitCircleCenterX, unitCircleCenterY, unitCircleRadius) {
@@ -26,8 +27,12 @@ export class PointModel{
 
     transformDiskToHalfPlane(){
         // (-i * z - i) / (z - 1)
-        const math = require('mathjs');
-        let z = math.complex(this.x, this.y);
+
+        // Normalize to unit disk
+        const nx = (this.x - this.unitCircleCenterX) / this.unitCircleRadius;
+        const ny = (this.unitCircleCenterY - this.y) / this.unitCircleRadius;
+
+        let z = math.complex(nx, ny);
         let i = math.complex(0, 1);
 
         const num = math.subtract( math.multiply(math.unaryMinus(i), z), i);
@@ -35,7 +40,9 @@ export class PointModel{
         const den = math.subtract(z, 1);
 
         const result = math.divide(num, den);
-        this.set (result.re, result.im);
+
+        const y0 = (2/3) * (this.unitCircleCenterY * 2);
+        this.set (result.re, y0 - result.im);
 
     }
 
@@ -45,15 +52,19 @@ export class PointModel{
         // z = x + y * i
         // x is real part, y is imag
 
-        const math = require('mathjs');
-        let z = math.complex(this.x, this.y);
+        const y0 = (2/3) * (this.unitCircleCenterY * 2);
+        const nx = this.x;
+        const ny = y0 - this.y;
+
+        let z = math.complex(nx, ny);
         let i = math.complex(0, 1);
 
         const num = math.subtract(z, i);
         const den = math.add(z, i);
 
         const result = math.divide(num, den);
-        this.set (result.re, result.im);
+        this.set (this.unitCircleCenterX + result.re * this.unitCircleRadius, 
+            this.unitCircleCenterY - result.im * this.unitCircleRadius);
     }
 
     toJSON() {

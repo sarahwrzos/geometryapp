@@ -12,11 +12,9 @@ export class HalfPlaneLineView {
     }
 
     draw() {
-        console.log("here")
         if (!this.svg) return;
 
         if (this.element) this.element.remove();
-        console.log("here")
         if (this.model.isVertical) {
             // Vertical Euclidean line
             this.element = this.svg.line(
@@ -28,7 +26,6 @@ export class HalfPlaneLineView {
             // Semicircle orthogonal to boundary
             
             const diameter = this.model.radius * 2;
-            console.log(diameter, this.model.center.x,this.model.center.y)
             this.element = this.svg.circle(diameter)
                 .center(this.model.center.x, this.model.center.y)
                 .fill('none')
@@ -48,10 +45,12 @@ export class HalfPlaneLineView {
         if (this.model.isVertical) {
 
             // Update vertical line
-            this.element.plot(
-                this.model.x, 0,
-                this.model.x, this.svg.height()
-            );
+            this.element.attr({
+            x1: this.model.x,
+            y1: 0,
+            x2: this.model.x,
+            y2: this.svg.height()
+        });
 
         } else {
 

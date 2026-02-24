@@ -76,6 +76,6 @@ export class PointView {
 
         // Move the existing circle to the model's position
         this.element.cx(this.model.x).cy(this.model.y);
-        this.element.front();
+        //this.element.front();
     }
 }

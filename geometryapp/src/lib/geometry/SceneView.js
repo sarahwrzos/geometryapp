@@ -1,5 +1,7 @@
 import { PointModel } from "$lib/geometry/PointModel.js";
 import { PointView } from "$lib/geometry/PointView.js";
+import { DiskLineView } from "$lib/geometry/DiskLineView.js";
+import { HalfPlaneLineView } from "$lib/geometry/HalfPlaneLineView.js";
 
 export class SceneView {
     constructor(sceneModel, svg) {
@@ -35,11 +37,21 @@ export class SceneView {
     }
 
     switchModel(newType) {
+        //todo apply clip again
         if (this.sceneModel.sceneType === newType) return;
 
         // Remove all visuals
         this.clear();
         this.baseElement.remove();
+
+        // transform points
+        this.sceneModel.points.forEach(p => {
+            if (newType === "HalfPlane") {
+                p.transformDiskToHalfPlane();
+            } else {
+                p.transformHalfPlaneToDisk();
+            }
+        });
 
         this.sceneModel.sceneType = newType;
 
@@ -59,14 +71,17 @@ export class SceneView {
         // Draw all lines
         if (this.sceneModel.sceneType === "Disk") {
             this.sceneModel.lines.forEach(lineModel => {
-                const view = new LineView(lineModel, this.svg);
+                const view = new DiskLineView(lineModel, this.svg);
                 view.draw();
                 this.lineViews.push(view);
             });
         }
         else{
-            //todo
-            //half plane line
+            this.sceneModel.lines.forEach(lineModel => {
+                const view = new HalfPlaneLineView(lineModel, this.svg, this);
+                view.draw();
+                this.lineViews.push(view);
+            });
         }
     }
 

@@ -172,6 +172,10 @@
     sceneView.switchModel("HalfPlane");
   }
 
+  function clearAll() {
+    sceneView.clear();
+  }
+
   onMount(() => {
     // Initialize SVG
     draw = SVG().addTo(container).size(container.clientWidth, container.clientHeight);
@@ -231,6 +235,7 @@
   <button on:click={startPointTool}>Draw Point</button>
   <button on:click={switchToDisk}>Switch to Poincare Disk Model</button>
   <button on:click={switchToHalfPlane}>Switch to Upper Half Plane Model</button>
+  <button on:click={clearAll}>Clear All</button>
 </div>
 
 <div bind:this={container} style="width: 100vw; height: calc(100vh - 50px); margin-top: 50px;"></div>

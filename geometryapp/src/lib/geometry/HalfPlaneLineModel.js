@@ -45,7 +45,7 @@ export class HalfPlaneLineModel {
 
         // Check for vertical line
         if (Math.abs(x1 - x2) < 1e-9) {
-
+            console.log("vertical");
             //todo vertical not working
             this.isVertical = true;
             this.center = null;

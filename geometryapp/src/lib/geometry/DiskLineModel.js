@@ -9,7 +9,6 @@ export class DiskLineModel {
         this.unitCircleRadius = unitCircleRadius;
         this.center = new PointModel(0, 0);
         this.color = 'black';//TODO, make color a param
-        console.log("init")
         this.computeGeodesic();
 
         // Listen to the points
@@ -72,7 +71,6 @@ export class DiskLineModel {
     }
 
     computeCircle() {
-        console.log("here")
         const ucx = this.unitCircleCenter.x;
         const ucy = this.unitCircleCenter.y;
         const ur = this.unitCircleRadius;

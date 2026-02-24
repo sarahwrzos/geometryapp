@@ -43,7 +43,6 @@ export class PointModel{
 
         const y0 = (2/3) * (this.unitCircleCenterY * 2);
         this.set (result.re, y0 - result.im);
-        console.log("new point", this.x, this.y);
 
     }
 
@@ -52,6 +51,7 @@ export class PointModel{
         // (z - i) / (z + i)
         // z = x + y * i
         // x is real part, y is imag
+        console.log("before", this.x, this.y);
 
         const y0 = (2/3) * (this.unitCircleCenterY * 2);
         const nx = this.x;
@@ -66,6 +66,8 @@ export class PointModel{
         const result = math.divide(num, den);
         this.set (this.unitCircleCenterX + result.re * this.unitCircleRadius, 
             this.unitCircleCenterY - result.im * this.unitCircleRadius);
+
+        console.log("after", this.x, this.y);
     }
 
     toJSON() {

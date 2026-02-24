@@ -190,9 +190,7 @@
     sceneModel = new SceneModel(centerX, centerY, radius);
     sceneView = new SceneView(sceneModel, draw);
 
-    sceneView.unitCircleClip = draw.clip().add(
-        draw.circle(diameter).center(centerX, centerY)
-    );
+    //sceneView.addDiskClip()
 
     // Handle clicks
     draw.on('click', (event) => {

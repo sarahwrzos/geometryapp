@@ -14,15 +14,39 @@ export class SceneView {
         this.setup()
     }
 
+    addDiskClip() {
+        this.unitCircleClip = this.svg.clip().add(
+            this.svg.circle(this.sceneModel.unitCircleRadius * 2)
+            .center(this.sceneModel.unitCircleCenterX, 
+                this.sceneModel.unitCircleCenterY)
+            );
+
+        this.applyClipToElements();
+    }
+
+    applyClipToElements() {
+        if (!this.unitCircleClip) return;
+
+        this.pointViews.forEach(v => {
+            if (v.element) v.element.clipWith(this.unitCircleClip);
+        });
+
+        this.lineViews.forEach(v => {
+            if (v.element) v.element.clipWith(this.unitCircleClip);
+        });
+    }
+
     setup() {
         // test
         if (this.sceneModel.sceneType === "Disk"){
             //draw unit circle
             //todo clear? draw existing points?
+            this.addDiskClip();
             this.baseElement = this.svg.circle(this.sceneModel.unitCircleRadius * 2)
-            .center(this.sceneModel.unitCircleCenterX, this.sceneModel.unitCircleCenterY)
-            .fill('none')
-            .stroke({ width: 2, color: '#000' });
+                .center(this.sceneModel.unitCircleCenterX, this.sceneModel.unitCircleCenterY)
+                .fill('none')
+                .stroke({ width: 2, color: '#000' });
+            this.baseElement.clipWith(this.unitCircleClip)
         }
         else {
             //draw upper half plane
@@ -43,6 +67,12 @@ export class SceneView {
         // Remove all visuals
         this.baseElement.remove();
 
+        // remove clip
+        if (this.unitCircleClip) {
+            this.unitCircleClip.remove();
+            this.unitCircleClip = null;
+        }
+
         // transform points
         this.sceneModel.points.forEach(p => {
             if (newType === "HalfPlane") {
@@ -57,6 +87,11 @@ export class SceneView {
 
         this.setup();
         this.render();
+
+        // add clip if disk
+        if (newType === "Disk") this.addDiskClip();
+        this.applyClipToElements();
+
     }
 
     render() {

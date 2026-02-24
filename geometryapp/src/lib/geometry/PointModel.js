@@ -43,6 +43,7 @@ export class PointModel{
 
         const y0 = (2/3) * (this.unitCircleCenterY * 2);
         this.set (result.re, y0 - result.im);
+        console.log("new point", this.x, this.y);
 
     }
 

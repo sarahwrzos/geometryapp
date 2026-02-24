@@ -45,14 +45,12 @@ export class HalfPlaneLineModel {
 
         // Check for vertical line
         if (Math.abs(x1 - x2) < 1e-5) {
-            console.log("vertical");
             //todo vertical not working
             this.isVertical = true;
             this.center = null;
             this.radius = null;
             this.x = x1;   // vertical line x-coordinate
         } else {
-            console.log("set")
             this.isVertical = false;
 
             // Compute center x-coordinate

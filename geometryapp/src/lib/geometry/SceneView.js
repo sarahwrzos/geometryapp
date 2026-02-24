@@ -93,6 +93,10 @@ export class SceneView {
         // Remove all line views
         this.lineViews.forEach(v => v.element.remove());
         this.lineViews = [];
+
+        // also remove models
+        this.sceneModel.lines = [];
+        this.sceneModel.points = [];
     }
 
     update() {

@@ -41,7 +41,6 @@ export class HalfPlaneLineView {
     update() {
         if (!this.element) return;
 
-        // HALF-PLANE MODE
         if (this.model.isVertical) {
 
             // Update vertical line

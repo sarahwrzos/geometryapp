@@ -49,15 +49,15 @@ export class PointView {
             const dist = Math.hypot(dx, dy);
 
             // clamp
-            if (dist > r) {
-                const scale = r / dist;
-                newX = cx + dx * scale;
-                newY = cy + dy * scale;
+            // if (dist > r) {
+            //     const scale = r / dist;
+            //     newX = cx + dx * scale;
+            //     newY = cy + dy * scale;
 
-                // Override the draggable's position
-                event.detail.handler.move(newX - event.detail.box.w / 2,
-                                        newY - event.detail.box.h / 2);
-            }
+            //     // Override the draggable's position
+            //     event.detail.handler.move(newX - event.detail.box.w / 2,
+            //                             newY - event.detail.box.h / 2);
+            // }
 
             // Update model (this triggers line updates)
             this.model.set(newX, newY);

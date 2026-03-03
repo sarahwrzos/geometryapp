@@ -132,6 +132,7 @@
 
     // Clear existing scene
     sceneModel.clear();
+    //todo
     sceneView.pointViews.forEach(v => v.element.remove());
     sceneView.lineViews.forEach(v => v.element.remove());
     sceneView.pointViews = [];

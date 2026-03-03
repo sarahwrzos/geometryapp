@@ -3,13 +3,13 @@
   import { SVG } from '@svgdotjs/svg.js';
   import '@svgdotjs/svg.draggable.js';
 
-  import { SceneModel } from '$lib/geometry/SceneModel.js';
-  import { SceneView } from '$lib/geometry/SceneView.js';
-  import { PointModel } from '$lib/geometry/PointModel.js';
-  import { PointView } from '$lib/geometry/PointView.js';
-  import { DiskLineModel } from '$lib/geometry/DiskLineModel.js';
-  import { DiskLineView } from '$lib/geometry/DiskLineView.js';
-   import { HalfPlaneLineView } from '$lib/geometry/HalfPlaneLineView.js';
+  import { SceneModel } from '$lib/geometry_old/SceneModel.js';
+  import { SceneView } from '$lib/geometry_old/SceneView.js';
+  import { PointModel } from '$lib/geometry_old/PointModel.js';
+  import { PointView } from '$lib/geometry_old/PointView.js';
+  import { DiskLineModel } from '$lib/geometry_old/DiskLineModel.js';
+  import { DiskLineView } from '$lib/geometry_old/DiskLineView.js';
+   import { HalfPlaneLineView } from '$lib/geometry_old/HalfPlaneLineView.js';
 
   let container;
   let draw;

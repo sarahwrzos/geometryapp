@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 
-import { Point } from "../src/lib/geometry/PointView.js";
+import { PointModel as Point } from "../src/lib/geometry/models/PointModel.js";
 
 describe("Point", () => {
 

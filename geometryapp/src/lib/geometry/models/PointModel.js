@@ -17,6 +17,6 @@ export class PointModel {
 
     static fromJSON(jsonString) {
         const obj = JSON.parse(jsonString);
-        return new PointModel(obj.x, obj,y);
+        return new PointModel(obj.x, obj.y);
     }
 }

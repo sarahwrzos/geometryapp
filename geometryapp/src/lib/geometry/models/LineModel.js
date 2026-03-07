@@ -1,6 +1,6 @@
-import PointModel from './PointModel.js';
+import { PointModel } from './PointModel.js';
 
-class LineModel {
+export class LineModel {
 
     // p1 and p2 are point model instances
     constructor(pointModel1, pointModel2, color) {

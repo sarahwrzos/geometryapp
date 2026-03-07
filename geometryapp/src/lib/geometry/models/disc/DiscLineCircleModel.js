@@ -1,7 +1,8 @@
-import PointModel from './PointModel.js';
+import { PointModel } from '../PointModel.js';
+import { LineModel } from '../LineModel.js'
 
 export class DiscLineCircleModel extends LineModel {
-    static setup(pointModel1, pointModel2, color) {
+    static create(pointModel1, pointModel2, color) {
         const line = new DiscLineCircleModel(pointModel1, pointModel2, color);
         line.computeGeodesic();
         return line;
@@ -39,7 +40,7 @@ export class DiscLineCircleModel extends LineModel {
         const r = Math.sqrt(cx*cx + cy*cy - 1);
 
         // Update the circle
-        this.center.set(cx, cy);
+        this.center.setXY(cx, cy);
         this.radius = Math.abs(r);   // ensure positive radius
         this.diameter = 2 * this.radius;
     }
@@ -58,7 +59,7 @@ export class DiscLineCircleModel extends LineModel {
         const p1 = PointModel.fromJSON(obj.pointModel1);
         const p2 = PointModel.fromJSON(obj.pointModel2);
 
-        return DiscLineCircleModel.setup(p1, p2, obj.color);
+        return DiscLineCircleModel.create(p1, p2, obj.color);
     }
 
 }

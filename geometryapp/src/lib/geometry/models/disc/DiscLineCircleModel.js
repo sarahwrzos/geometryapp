@@ -25,23 +25,28 @@ export class DiscLineCircleModel extends LineModel {
         const x2 = this.pointModel2.x;
         const y2 = this.pointModel2.y;
 
+        // Direction vector of the line
+        let dx = x2 - x1;
+        let dy = y2 - y1;
+
+        const length = Math.sqrt(dx * dx + dy * dy);
+
+        if (length === 0) {
+            throw new Error("Points must be distinct");
+        }
+
+        // Compute circle center and radius
         const d1 = x1*x1 + y1*y1;
         const d2 = x2*x2 + y2*y2;
-
-        const denom = 2 * (x1*y2 - y1*x2);
-
-        if (denom === 0) {
-            throw new Error("Points are collinear; cannot compute circle in unit disc");
-        }
+        const denom = 2 * (x1*y2 - y1*x2);  // should not be 0 here
 
         const cx = (y2*(d1 + 1) - y1*(d2 + 1)) / denom;
         const cy = (x1*(d2 + 1) - x2*(d1 + 1)) / denom;
 
         const r = Math.sqrt(cx*cx + cy*cy - 1);
 
-        // Update the circle
         this.center.setXY(cx, cy);
-        this.radius = Math.abs(r);   // ensure positive radius
+        this.radius = Math.abs(r);
         this.diameter = 2 * this.radius;
     }
 

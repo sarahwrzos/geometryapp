@@ -73,3 +73,37 @@ describe("DiscLineDiameterModel", () => {
     });
 
 });
+
+describe("DiscLineDiameterModel - distinct points", () => {
+
+    it("throws an error if both points are identical", () => {
+        const p1 = new PointModel(0.5, 0.0);
+        const p2 = new PointModel(0.5, 0.0); // identical point
+
+        expect(() => {
+            DiscLineDiameterModel.create(p1, p2, "red");
+        }).toThrow("Points must be distinct");
+    });
+
+    it("does not throw if points are distinct", () => {
+        const p1 = new PointModel(0.0, 0.5);
+        const p2 = new PointModel(0.0, -0.5);
+
+        expect(() => {
+            DiscLineDiameterModel.create(p1, p2, "blue");
+        }).not.toThrow();
+    });
+
+    it("computes the correct normalized direction", () => {
+        const p1 = new PointModel(0.0, -1.0);
+        const p2 = new PointModel(0.0, 1.0);
+
+        const line = DiscLineDiameterModel.create(p1, p2, "green");
+
+        expect(line.direction).toBeDefined();
+        // Should point roughly along the line from p1 -> p2
+        expect(line.direction.x).toBeCloseTo(0);
+        expect(line.direction.y).toBeCloseTo(1);
+    });
+
+});

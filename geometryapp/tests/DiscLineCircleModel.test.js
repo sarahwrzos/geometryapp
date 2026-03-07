@@ -64,3 +64,25 @@ describe("DiscLineCircleModel", () => {
     });
 
 });
+
+describe("DiscLineCircleModel - distinct points", () => {
+
+    it("throws an error if both points are identical", () => {
+        const p1 = new PointModel(0.3, 0.4);
+        const p2 = new PointModel(0.3, 0.4); // identical point
+
+        expect(() => {
+            DiscLineCircleModel.create(p1, p2, "red");
+        }).toThrow("Points must be distinct");
+    });
+
+    it("does not throw if points are distinct", () => {
+        const p1 = new PointModel(0.1, 0.2);
+        const p2 = new PointModel(-0.2, 0.3);
+
+        expect(() => {
+            DiscLineCircleModel.create(p1, p2, "blue");
+        }).not.toThrow();
+    });
+
+});

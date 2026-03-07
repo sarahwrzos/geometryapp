@@ -5,14 +5,6 @@ export class PointModel {
         this.y = y;
     }
 
-    getX() {
-        return this.x;
-    }
-
-    getY() {
-        return this.y;
-    }
-
     setXY(newX, newY) {
         this.x = newX;
         this.y = newY;

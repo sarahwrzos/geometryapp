@@ -3,11 +3,16 @@ export class PointModel {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.listeners = [];
     }
 
     setXY(newX, newY) {
         this.x = newX;
         this.y = newY;
+    }
+
+    addListener(fn) {
+        this.listeners.push(fn);
     }
 
     // save x and y values

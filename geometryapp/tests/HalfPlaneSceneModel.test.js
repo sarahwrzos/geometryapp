@@ -58,4 +58,15 @@ describe("HalfPlaneSceneModel", () => {
         }).toThrow(TypeError);
     });
 
+    it("throws an error if a point is not in the upper half-plane", () => {
+        const scene = new HalfPlaneSceneModel();
+
+        const p1 = new PointModel(1, -2);  // invalid: below x-axis
+        const p2 = new PointModel(2, 3);
+
+        expect(() => {
+            scene.addLine(p1, p2);
+        }).toThrow();
+    });
+
 });

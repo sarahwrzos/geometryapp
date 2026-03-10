@@ -10,18 +10,22 @@ export class DiscSceneView extends SceneView {
     // Factory method
     static create(sceneModel, svg, containerHeight, containerWidth, scale) {
         const view = new DiscSceneView(sceneModel, svg, containerHeight, containerWidth, scale);
+
         view.createScene(); // actually draw the unit disc and clip
         return view;
     }
 
     // Draws the unit disc and sets up the clip
     createScene() {
+        console.log("create scene");
+        console.log(this.svg);
         if (!this.svg) return;
 
         const radius = Math.min(this.containerWidth, this.containerHeight) / 2;
         const cx = this.containerWidth / 2;
         const cy = this.containerHeight / 2;
-
+        console.log("radius");
+        console.log(radius, cx, cy);
         // Draw the circle for the scene
         if (this.circleElement) this.circleElement.remove(); // remove old if exists
         this.circleElement = this.svg.circle(radius * 2)
@@ -69,16 +73,20 @@ export class DiscSceneView extends SceneView {
         const cx = this.containerWidth / 2;
         const cy = this.containerHeight / 2;
 
-        this.unitCircleClip = this.svg.circle(radius * 2).center(cx, cy);
+        this.unitCircleClip = this.svg.clip().add(this.svg.circle(radius * 2).center(cx, cy));
 
         this.applyClipToElements();
     }
 
     applyClipToElements() {
-        [...this.lineViews, ...this.pointViews].forEach(view => {
-            if (view.element && this.unitCircleClip) {
-                view.element.clipWith(this.unitCircleClip);
-            }
+        if (!this.unitCircleClip) return;
+
+        this.pointViews.forEach(v => {
+            if (v.element) v.element.clipWith(this.unitCircleClip);
+        });
+
+        this.lineViews.forEach(v => {
+            if (v.element) v.element.clipWith(this.unitCircleClip);
         });
     }
 

@@ -1,9 +1,9 @@
 export class GeodesicView {
-    static create(ViewClass, model, sceneView, svg, options = {}) {
+    static create(ViewClass, model, sceneView, options = {}) {
         const color = options.color ?? "black";
         const width = options.width ?? 2;
 
-        const view = new ViewClass(model, svg, sceneView, color, width);
+        const view = new ViewClass(model, sceneView, color, width);
 
         view.draw();
         view.enableHover(options.highlightColor ?? "red");
@@ -15,11 +15,9 @@ export class GeodesicView {
         return view;
     }
 
-    constructor(model, svg, sceneView, color = "black", width = 2) {
+    constructor(model, sceneView, color = "black", width = 2) {
 
         this.model = model;
-        this.svg = svg;
-
         this.color = color;
         this.width = width;
         this.sceneView = sceneView; // for math->pixel conversion

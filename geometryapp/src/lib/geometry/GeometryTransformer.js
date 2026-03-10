@@ -3,7 +3,7 @@ import { PointModel } from "./models/PointModel.js";
 
 export class GeometryTransformer {
 
-  static discToHalfPlane(pointDisc) {
+  static DiscToHalfPlane(pointDisc) {
     const z = complex(pointDisc.x, pointDisc.y);
     const i = complex(0, 1);
 
@@ -17,7 +17,7 @@ export class GeometryTransformer {
     return new PointModel(w.re, w.im);
   }
 
-  static halfPlaneToDisc(pointHalf) {
+  static HalfPlaneToDisc(pointHalf) {
     const w = complex(pointHalf.x, pointHalf.y);
     const i = complex(0, 1);
 

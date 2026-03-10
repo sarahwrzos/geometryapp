@@ -7,7 +7,7 @@ export class SceneModel {
         this.pointModels = [];
     }
 
-    addPoint(pointModel1) {
+    addPoint(pointModel) {
         if (!(pointModel instanceof PointModel)) {
             throw new TypeError("Only PointModel instances can be added");
         }

@@ -1,236 +1,148 @@
 <script>
-  import { onMount } from 'svelte';
-  import { SVG } from '@svgdotjs/svg.js';
-  import '@svgdotjs/svg.draggable.js';
+  import { onMount } from "svelte";
+  import { SVG } from "@svgdotjs/svg.js";
+  import "@svgdotjs/svg.draggable.js";
 
-  import { SceneModel } from '$lib/geometry_old/SceneModel.js';
-  import { SceneView } from '$lib/geometry_old/SceneView.js';
-  import { PointModel } from '$lib/geometry_old/PointModel.js';
-  import { PointView } from '$lib/geometry_old/PointView.js';
-  import { DiskLineModel } from '$lib/geometry_old/DiskLineModel.js';
-  import { DiskLineView } from '$lib/geometry_old/DiskLineView.js';
-   import { HalfPlaneLineView } from '$lib/geometry_old/HalfPlaneLineView.js';
+  import { SceneView } from "$lib/geometry/views/SceneView.js";
+  import { DiscSceneView } from "$lib/geometry/views/DiscSceneView.js";
+  import { HalfPlaneSceneView } from "$lib/geometry/views/HalfPlaneSceneView.js";
+  import { PointView } from "$lib/geometry/views/PointView.js";
+  import { LineView } from "$lib/geometry/views/LineView.js";
+  import { AppController } from "$lib/geometry/AppController.js";
+  import { DiscSceneModel } from "$lib/geometry/models/disc/DiscSceneModel";
+  import { PointModel } from "$lib/geometry/models/PointModel";
 
   let container;
   let draw;
-  let sceneModel;
-  let sceneView;
-  let saveName = 'default';
-
+  let appController;
   let activeTool = null;
   let tempPoint = null;
+  let currentSceneView;
+  let saveName = "default";
 
-  // Get SVG-relative coordinates
-  function getClickCoords(event) {
-    const pt = draw.node.createSVGPoint();
-    pt.x = event.clientX;
-    pt.y = event.clientY;
-    return pt.matrixTransform(draw.node.getScreenCTM().inverse());
+  function startPointTool() {
+    activeTool = "point";
   }
 
   function startHyperbolicLineTool() {
-    activeTool = 'hyperbolicLine';
-    tempPoint = null; // reset first click
+    activeTool = "hyperbolicLine";
+    tempPoint = null;
   }
 
-  function startPointTool() {
-    activeTool = 'point';
-  }
-
-  // Optional: helper for adding buttons to lines
-  function addButton(x, y, label, action) {
-    const btn = document.createElement('button');
-    btn.textContent = label;
-    btn.style.position = 'absolute';
-    btn.style.top = `${y}px`;
-    btn.style.left = `${x}px`;
-    btn.style.zIndex = 1000;
-    btn.style.margin = '2px';
-    btn.onclick = action;
-    document.body.appendChild(btn);
-    return btn;
-  }
-
-  function makeLineActions(lineView) {
+  function makeLineActions(lineView, sceneView) {
     if (!lineView.element) return;
 
-    lineView.element.on('click', (e) => {
+    lineView.element.on("click", (e) => {
       e.stopPropagation();
 
-      document.querySelectorAll('button.line-action').forEach(b => b.remove());
+      document.querySelectorAll("button.line-action").forEach(b => b.remove());
 
-      addButton(e.clientX, e.clientY, 'Remove', () => {
+      const removeBtn = document.createElement("button");
+      removeBtn.textContent = "Remove";
+      removeBtn.classList.add("line-action");
+      removeBtn.style.position = "absolute";
+      removeBtn.style.top = `${e.clientY}px`;
+      removeBtn.style.left = `${e.clientX}px`;
+      removeBtn.onclick = () => {
         lineView.element.remove();
-        sceneModel.removeLine(lineView.model);
-        
-        // remove the two points
+        sceneView.sceneModel.removeLine(lineView.model);
         lineView.model.p1.view?.element.remove();
         lineView.model.p2.view?.element.remove();
+        document.querySelectorAll("button.line-action").forEach(b => b.remove());
+      };
+      document.body.appendChild(removeBtn);
 
-        // remove action buttons
-        document.querySelectorAll('button.line-action')
-        .forEach(b => b.remove());
-      }).classList.add('line-action');
-
-      addButton(e.clientX + 60, e.clientY, 'Color', () => {
-        const newColor = prompt('Enter color (e.g., red or #00ff00):', 'black');
+      const colorBtn = document.createElement("button");
+      colorBtn.textContent = "Color";
+      colorBtn.classList.add("line-action");
+      colorBtn.style.position = "absolute";
+      colorBtn.style.top = `${e.clientY}px`;
+      colorBtn.style.left = `${e.clientX + 60}px`;
+      colorBtn.onclick = () => {
+        const newColor = prompt("Enter color (e.g., red or #00ff00):", "black");
         if (newColor) {
           lineView.model.color = newColor;
           lineView.element.stroke({ color: newColor });
         }
-
-        // remove action buttons
-        document.querySelectorAll('button.line-action')
-        .forEach(b => b.remove());
-      }).classList.add('line-action');
+        document.querySelectorAll("button.line-action").forEach(b => b.remove());
+      };
+      document.body.appendChild(colorBtn);
     });
 
-    lineView.element.on('mouseover', () => lineView.element.stroke({ color: 'red' }));
-    lineView.element.on('mouseout', () => lineView.element.stroke({ color: lineView.model.color }));
+    lineView.element.on("mouseover", () => lineView.element.stroke({ color: "red" }));
+    lineView.element.on("mouseout", () => lineView.element.stroke({ color: lineView.model.color }));
   }
 
-  function drawLine(lineModel) {
-    if (sceneView.sceneModel.sceneType === "Disk"){
-      const lineView = new DiskLineView(lineModel, draw, sceneView);
-      lineView.draw();
-      makeLineActions(lineView);
-      sceneView.lineViews.push(lineView);
+  function drawLine(lineModel, sceneView) {
+    const lineView = LineView.create(LineView, lineModel, sceneView);
+    makeLineActions(lineView, sceneView);
+    sceneView.lineViews.push(lineView);
+  }
+
+  function addPointAt(x, y) {
+    const pointModel = new PointModel(x, y);
+    console.log(pointModel);
+    currentSceneView.sceneModel.addPoint(pointModel);
+    const pointView = PointView.createDraggable(pointModel, currentSceneView.svg);
+    currentSceneView.pointViews.push(pointView);
+    return pointModel;
+  }
+
+  function handleClick(event) {
+    const pt = draw.node.createSVGPoint();
+    pt.x = event.clientX;
+    pt.y = event.clientY;
+    const coords = pt.matrixTransform(draw.node.getScreenCTM().inverse());
+
+    if (activeTool === "point") {
+      addPointAt(coords.x, coords.y);
+      activeTool = null;
+    } else if (activeTool === "hyperbolicLine") {
+      const newPoint = addPointAt(coords.x, coords.y);
+      if (!tempPoint) {
+        tempPoint = newPoint;
+      } else {
+        const lineModel = currentSceneView.sceneModel.addLine(tempPoint, newPoint);
+        drawLine(lineModel, currentSceneView);
+        tempPoint = null;
+        activeTool = null;
+      }
     }
-    else{
-      const lineView = new HalfPlaneLineView(lineModel, draw, sceneView);
-      lineView.draw();
-      makeLineActions(lineView);
-      sceneView.lineViews.push(lineView);
-    }
-  }
-
-  function saveConstruction(name) {
-    const pointIndexMap = new Map();
-
-    sceneModel.points.forEach((p, i) => {
-      pointIndexMap.set(p, i);
-    });
-
-    const data = {
-      points: sceneModel.points.map(p => p.toJSON()),
-      lines: sceneModel.lines.map(l => ({
-        p1: pointIndexMap.get(l.p1),
-        p2: pointIndexMap.get(l.p2),
-        color: l.color
-      }))
-    };
-
-    localStorage.setItem(name, JSON.stringify(data));
-    console.log("Saved construction:", name);
-  }
-
-  function loadConstruction(name, unitCircleCenter, unitCircleRadius) {
-    const json = localStorage.getItem(name);
-    if (!json) return;
-
-    const data = JSON.parse(json);
-
-    // Clear existing scene
-    sceneModel.clear();
-    sceneView.pointViews.forEach(v => v.element.remove());
-    sceneView.lineViews.forEach(v => v.element.remove());
-    sceneView.pointViews = [];
-    sceneView.lineViews = [];
-
-    // Restore points
-    const points = data.points.map(pData => {
-      const pt = sceneModel.addPoint(pData.x, pData.y);
-      const view = new PointView(pt, draw);
-      view.draw();
-      view.enableDrag();
-      sceneView.pointViews.push(view);
-      return pt;
-    });
-
-    // Restore lines
-    data.lines.forEach(lData => {
-      const lineModel = sceneModel.addLine(
-        points[lData.p1],
-        points[lData.p2]
-      );
-      lineModel.color = lData.color || "black";
-
-      const lineView = new DiskLineView(lineModel, draw, sceneView, lineModel.color);
-      lineView.draw();
-      makeLineActions(lineView);
-      sceneView.lineViews.push(lineView);
-    });
-
-    console.log("Loaded construction:", name);
   }
 
   function switchToDisk() {
-    sceneView.switchModel("Disk");
+    const sceneModel = currentSceneView.sceneModel; // reuse model if desired
+    currentSceneView.removeScene();
+    currentSceneView = DiscSceneView.create(sceneModel, draw, container.clientHeight, container.clientWidth, 50);
   }
 
   function switchToHalfPlane() {
-    sceneView.switchModel("HalfPlane");
+    const sceneModel = currentSceneView.sceneModel; // reuse model
+    currentSceneView.removeScene();
+    currentSceneView = HalfPlaneSceneView.create(sceneModel, draw, container.clientHeight, container.clientWidth, 50);
   }
 
   function clearAll() {
-    sceneView.clear();
+    currentSceneView.removeScene();
   }
 
   onMount(() => {
-    // Initialize SVG
     draw = SVG().addTo(container).size(container.clientWidth, container.clientHeight);
+    appController = new AppController();
 
-    // Unit circle
-    const centerX = container.clientWidth / 2;
-    const centerY = container.clientHeight / 2;
-    const diameter = container.clientHeight / 2;
-    const radius = diameter / 2;
+    // initialize default scene
+    console.log(container.clientHeight, container.clientWidth)
+    const sceneModel = new DiscSceneModel();
+    currentSceneView = DiscSceneView.create(sceneModel, draw, container.clientHeight, container.clientWidth, 50);
 
-    // Initialize SceneModel and SceneView
-    sceneModel = new SceneModel(centerX, centerY, radius);
-    sceneView = new SceneView(sceneModel, draw);
-
-    //sceneView.addDiskClip()
-
-    // Handle clicks
-    draw.on('click', (event) => {
-      const coords = getClickCoords(event);
-
-      if (activeTool === 'point') {
-        const pointModel = sceneModel.addPoint(coords.x, coords.y);
-        const pointView = new PointView(pointModel, draw);
-        pointView.draw();
-        pointView.enableDrag();
-        sceneView.pointViews.push(pointView);
-        activeTool = null;
-      }
-
-      if (activeTool === 'hyperbolicLine') {
-        const pointModel = sceneModel.addPoint(coords.x, coords.y);
-        const pointView = new PointView(pointModel, draw);
-        pointView.draw();
-        pointView.enableDrag();
-        sceneView.pointViews.push(pointView);
-
-        if (tempPoint === null) {
-          tempPoint = pointModel;
-        } else {
-          const lineModel = sceneModel.addLine(tempPoint, pointModel);
-          drawLine(lineModel);
-          tempPoint = null;
-          activeTool = null; // deactivate after one line
-        }
-      }
-    });
+    draw.on("click", handleClick);
   });
 </script>
 
 <div style="position: absolute; top: 10px; left: 10px; z-index: 1000;">
   <input bind:value={saveName} placeholder="Save name" />
-  <button on:click={saveConstruction}>Save</button>
-  <button on:click={loadConstruction}>Load</button>
-  <button on:click={startHyperbolicLineTool}>Draw Hyperbolic Line</button>
   <button on:click={startPointTool}>Draw Point</button>
+  <button on:click={startHyperbolicLineTool}>Draw Hyperbolic Line</button>
   <button on:click={switchToDisk}>Switch to Poincare Disk Model</button>
   <button on:click={switchToHalfPlane}>Switch to Upper Half Plane Model</button>
   <button on:click={clearAll}>Clear All</button>

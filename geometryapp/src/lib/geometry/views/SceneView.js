@@ -4,20 +4,28 @@ export class SceneView {
         this.svg = svg;
         this.pointViews = [];
         this.lineViews = [];
-        this.containerHeight = containerHeight;
-        this.containerWidth = containerWidth;
-        this.scale = scale;
+        this._containerHeight = containerHeight;
+        this._containerWidth = containerWidth;
+        this.scale = Math.min(this.containerHeight, this.containerHeight) / 2;
 
     }
 
+    get containerWidth() {
+        return this._containerWidth;
+    }
+
+    get containerHeight() {
+        return this._containerHeight;
+    }
+
     set containerWidth(value) {
-        this.containerWidth = value;
+        this._containerWidth = value;
         this.createScene();
         this.renderAll();
     }
 
     set containerHeight(value) {
-        this.containerHeight = value;
+        this._containerHeight = value;
         this.createScene();
         this.renderAll();
     }

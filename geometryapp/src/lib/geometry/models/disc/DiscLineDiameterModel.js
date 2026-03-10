@@ -15,6 +15,8 @@ export class DiscLineDiameterModel extends LineModel {
         // A diameter always passes through the origin
         this.center = new PointModel(0, 0);
         this.direction = null; // normalized direction vector
+
+        this.listeners = [];
     }
 
     computeGeodesic() {
@@ -42,6 +44,10 @@ export class DiscLineDiameterModel extends LineModel {
         dy /= length;
 
         this.direction = { x: dx, y: dy };
+    }
+
+    addListener(fn) {
+        this.listeners.push(fn);
     }
 
     toJSON() {

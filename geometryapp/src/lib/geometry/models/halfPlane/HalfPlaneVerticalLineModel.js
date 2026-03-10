@@ -13,6 +13,8 @@ export class HalfPlaneVerticalLineModel extends LineModel {
         super(pointModel1, pointModel2, color);
 
         this.x = null; // x-coordinate of vertical line
+
+        this.listeners = [];
     }
 
     computeGeodesic() {
@@ -25,6 +27,10 @@ export class HalfPlaneVerticalLineModel extends LineModel {
         }
 
         this.x = this.pointModel1.x;
+    }
+
+    addListener(fn) {
+        this.listeners.push(fn);
     }
 
     toJSON() {

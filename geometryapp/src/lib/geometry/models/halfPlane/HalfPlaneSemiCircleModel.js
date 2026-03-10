@@ -14,6 +14,7 @@ export class HalfPlaneSemiCircleModel extends LineModel {
 
         this.center = new PointModel(0, 0);
         this.radius = null;
+        this.listeners = [];
     }
 
     computeGeodesic() {
@@ -40,6 +41,10 @@ export class HalfPlaneSemiCircleModel extends LineModel {
         this.center.setXY(cx, cy);
         this.radius = Math.abs(r);
         this.diameter = 2 * this.radius;
+    }
+
+    addListener(fn) {
+        this.listeners.push(fn);
     }
 
     toJSON() {

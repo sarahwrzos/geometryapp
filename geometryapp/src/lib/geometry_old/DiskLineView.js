@@ -1,4 +1,4 @@
-export class DiskLineView {
+export class DiscLineView {
     constructor(model, svg, sceneView, color = "black", width = 2) {
         this.model = model;
         this.svg = svg;

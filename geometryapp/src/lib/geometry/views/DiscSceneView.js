@@ -1,15 +1,15 @@
 import { SceneView } from "./SceneView.js";
 
 export class DiscSceneView extends SceneView {
-    constructor(sceneModel, svg, containerHeight, containerWidth, scale) {
-        super(sceneModel, svg, containerHeight, containerWidth, scale);
+    constructor(sceneModel, svg, containerHeight, containerWidth) {
+        super(sceneModel, svg, containerHeight, containerWidth);
         this.unitCircleClip = null;
         this.circleElement = null; // the actual SVG circle for display
     }
 
     // Factory method
-    static create(sceneModel, svg, containerHeight, containerWidth, scale) {
-        const view = new DiscSceneView(sceneModel, svg, containerHeight, containerWidth, scale);
+    static create(sceneModel, svg, containerHeight, containerWidth ) {
+        const view = new DiscSceneView(sceneModel, svg, containerHeight, containerWidth);
 
         view.createScene(); // actually draw the unit disc and clip
         return view;
@@ -17,15 +17,11 @@ export class DiscSceneView extends SceneView {
 
     // Draws the unit disc and sets up the clip
     createScene() {
-        console.log("create scene");
-        console.log(this.svg);
         if (!this.svg) return;
 
         const radius = Math.min(this.containerWidth, this.containerHeight) / 2;
         const cx = this.containerWidth / 2;
         const cy = this.containerHeight / 2;
-        console.log("radius");
-        console.log(radius, cx, cy);
         // Draw the circle for the scene
         if (this.circleElement) this.circleElement.remove(); // remove old if exists
         this.circleElement = this.svg.circle(radius * 2)

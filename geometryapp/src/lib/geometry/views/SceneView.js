@@ -1,5 +1,7 @@
+import { PointModel } from "../models/PointModel";
+
 export class SceneView {
-    constructor(sceneModel, svg, containerHeight, containerWidth, scale) {
+    constructor(sceneModel, svg, containerHeight, containerWidth) {
         this.sceneModel = sceneModel;
         this.svg = svg;
         this.pointViews = [];
@@ -55,6 +57,11 @@ export class SceneView {
         const px = this.containerWidth / 2 + pointModel.x * this.scale;
         const py = this.containerHeight / 2 - pointModel.y * this.scale;
         return { x: px, y: py };
+    }
+
+    mathToScreenPoint(pointModel) {
+        const { x, y } = this.mathToScreen(pointModel);
+        return new PointModel(x, y);
     }
 
     screenToMath(px, py) {

@@ -77,15 +77,16 @@
     const lineView = LineView.create(LineView, lineModel, sceneView);
     makeLineActions(lineView, sceneView);
     sceneView.lineViews.push(lineView);
+    console.log(sceneView.lineViews[0]);
   }
 
   function addPointAt(x, y) {
-    const pointModel = new PointModel(x, y);
-    console.log(pointModel);
-    currentSceneView.sceneModel.addPoint(pointModel);
-    const pointView = PointView.createDraggable(pointModel, currentSceneView.svg);
+    const screenPoint = new PointModel(x, y);
+    const mathPoint = currentSceneView.screenToMathPoint(x, y);
+    currentSceneView.sceneModel.addPoint(mathPoint);
+    const pointView = PointView.createDraggable(screenPoint, currentSceneView.svg);
     currentSceneView.pointViews.push(pointView);
-    return pointModel;
+    return screenPoint;
   }
 
   function handleClick(event) {
@@ -102,7 +103,10 @@
       if (!tempPoint) {
         tempPoint = newPoint;
       } else {
-        const lineModel = currentSceneView.sceneModel.addLine(tempPoint, newPoint);
+        console.log("newpoint", currentSceneView.screenToMathPoint(tempPoint))
+        const lineModel = currentSceneView.sceneModel.addLine(
+            currentSceneView.screenToMathPoint(tempPoint.x, tempPoint.y), 
+            currentSceneView.screenToMathPoint(newPoint.x, newPoint.y));
         drawLine(lineModel, currentSceneView);
         tempPoint = null;
         activeTool = null;
@@ -113,13 +117,13 @@
   function switchToDisk() {
     const sceneModel = currentSceneView.sceneModel; // reuse model if desired
     currentSceneView.removeScene();
-    currentSceneView = DiscSceneView.create(sceneModel, draw, container.clientHeight, container.clientWidth, 50);
+    currentSceneView = DiscSceneView.create(sceneModel, draw, container.clientHeight, container.clientWidth);
   }
 
   function switchToHalfPlane() {
     const sceneModel = currentSceneView.sceneModel; // reuse model
     currentSceneView.removeScene();
-    currentSceneView = HalfPlaneSceneView.create(sceneModel, draw, container.clientHeight, container.clientWidth, 50);
+    currentSceneView = HalfPlaneSceneView.create(sceneModel, draw, container.clientHeight, container.clientWidth);
   }
 
   function clearAll() {
@@ -131,9 +135,8 @@
     appController = new AppController();
 
     // initialize default scene
-    console.log(container.clientHeight, container.clientWidth)
     const sceneModel = new DiscSceneModel();
-    currentSceneView = DiscSceneView.create(sceneModel, draw, container.clientHeight, container.clientWidth, 50);
+    currentSceneView = DiscSceneView.create(sceneModel, draw, container.clientHeight, container.clientWidth);
 
     draw.on("click", handleClick);
   });

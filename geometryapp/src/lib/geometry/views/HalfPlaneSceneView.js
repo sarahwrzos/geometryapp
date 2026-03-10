@@ -1,15 +1,15 @@
 import { SceneView } from "./SceneView.js";
 
 export class HalfPlaneSceneView extends SceneView {
-    constructor(sceneModel, svg, containerHeight, containerWidth, scale) {
-        super(sceneModel, svg, containerHeight, containerWidth, scale);
+    constructor(sceneModel, svg, containerHeight, containerWidth) {
+        super(sceneModel, svg, containerHeight, containerWidth);
         this.baseLineElement = null;   // horizontal line at 2/3 height
         this.clipRect = null;          // SVG rectangle clip for top 2/3
     }
 
     // Factory method
-    static create(sceneModel, svg, containerHeight, containerWidth, scale) {
-        const view = new HalfPlaneSceneView(sceneModel, svg, containerHeight, containerWidth, scale);
+    static create(sceneModel, svg, containerHeight, containerWidth) {
+        const view = new HalfPlaneSceneView(sceneModel, svg, containerHeight, containerWidth);
         view.createScene();
         return view;
     }

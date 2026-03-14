@@ -17,8 +17,6 @@ export class LineView extends GeodesicView {
             this.element.plot(p1.x, p1.y, p2.x, p2.y);
         }
 
-        this.sceneView.updateClip(); 
-
         return this.element;
     }
 

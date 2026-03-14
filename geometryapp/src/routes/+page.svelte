@@ -74,10 +74,8 @@
   }
 
   function drawLine(lineModel, sceneView) {
-    console.log("line model", lineModel)
     let lineView;
     if (lineModel.type === "Line") {
-      console.log("linetype")
       lineView = LineView.create(LineView, lineModel, sceneView);
     }
     else {
@@ -85,6 +83,7 @@
     }
     makeLineActions(lineView, sceneView);
     sceneView.lineViews.push(lineView);
+    sceneView.updateClip();
   }
 
   function addPointAt(x, y) {
@@ -94,6 +93,7 @@
 
     const pointView = PointView.createDraggable(mathPoint, currentSceneView);
     currentSceneView.pointViews.push(pointView);
+    currentSceneView.updateClip();
 
     return mathPoint;
   }

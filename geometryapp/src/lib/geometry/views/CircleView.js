@@ -19,7 +19,6 @@ export class CircleView extends GeodesicView {
             this.element.size(radius * 2).center(center.x, center.y);
         }
 
-        this.sceneView.updateClip();
         return this.element;
     }
 

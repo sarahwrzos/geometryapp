@@ -88,12 +88,14 @@
   }
 
   function addPointAt(x, y) {
-    const screenPoint = new PointModel(x, y);
     const mathPoint = currentSceneView.screenToMathPoint(x, y);
+
     currentSceneView.sceneModel.addPoint(mathPoint);
-    const pointView = PointView.createDraggable(screenPoint, currentSceneView.svg);
+
+    const pointView = PointView.createDraggable(mathPoint, currentSceneView);
     currentSceneView.pointViews.push(pointView);
-    return screenPoint;
+
+    return mathPoint;
   }
 
   function handleClick(event) {
@@ -110,9 +112,7 @@
       if (!tempPoint) {
         tempPoint = newPoint;
       } else {
-        const lineModel = currentSceneView.sceneModel.addLine(
-            currentSceneView.screenToMathPoint(tempPoint.x, tempPoint.y), 
-            currentSceneView.screenToMathPoint(newPoint.x, newPoint.y));
+        const lineModel = currentSceneView.sceneModel.addLine(tempPoint, newPoint);
         drawLine(lineModel, currentSceneView);
         tempPoint = null;
         activeTool = null;

@@ -70,7 +70,7 @@ export class DiscSceneView extends SceneView {
         const cx = this.containerWidth / 2;
         const cy = this.containerHeight / 2;
 
-        this.unitCircleClip = this.svg.clip().add(this.svg.circle(radius).center(cx, cy));
+        this.unitCircleClip = this.svg.clip().add(this.svg.circle(radius * 2).center(cx, cy));
 
         this.applyClipToElements();
     }

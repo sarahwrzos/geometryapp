@@ -3,27 +3,30 @@ import { SceneView } from "./SceneView.js";
 
 export class LineView extends GeodesicView {
     constructor(model, sceneView, color = "black", width = 2) {
-        console.log("line")
         super(model, sceneView, color, width);
     }
 
     draw() {
-        const p1 = this.sceneView.mathToScreenPoint(this.model.pointModel1);
-        const p2 = this.sceneView.mathToScreenPoint(this.model.pointModel2);
-        if (this.element) this.element.remove();
+        const p1 = this.sceneView.mathToScreen(this.model.pointModel1);
+        const p2 = this.sceneView.mathToScreen(this.model.pointModel2);
 
-        this.element = this.sceneView.svg.line(p1.x, p1.y, p2.x, p2.y)
-            .stroke({ color: this.color, width: this.width });
+        if (!this.element) {
+            this.element = this.sceneView.svg.line(p1.x, p1.y, p2.x, p2.y)
+                .stroke({ color: this.color, width: this.width });
+        } else {
+            this.element.plot(p1.x, p1.y, p2.x, p2.y);
+        }
 
-        this.sceneView.updateClip();
+        this.sceneView.updateClip(); 
+
         return this.element;
     }
 
     update() {
         if (!this.element) return;
 
-        const p1 = this.sceneView.mathToScreenPoint(this.model.pointModel1);
-        const p2 = this.sceneView.mathToScreenPoint(this.model.pointModel2);
+        const p1 = this.sceneView.mathToScreen(this.model.pointModel1);
+        const p2 = this.sceneView.mathToScreen(this.model.pointModel2);
 
         this.element.plot(p1.x, p1.y, p2.x, p2.y);
     }

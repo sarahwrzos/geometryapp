@@ -30,12 +30,12 @@ export class PointView {
     draw() {
         if (!this.svg) return;
 
-        // Create the circle element
+        const { x, y } = this.sceneView.mathToScreen(this.model);
+
         this.element = this.svg.circle(this.radius * 2);
-        this.element.cx(this.model.x).cy(this.model.y);
+        this.element.cx(x).cy(y);
         this.element.fill(this.color);
 
-        // attach hover automatically
         this.element.on('mouseover', () => this.element.stroke({ color: 'red' }));
         this.element.on('mouseout', () => this.element.stroke({ color: this.color }));
 
@@ -89,8 +89,7 @@ export class PointView {
     update() {
         if (!this.element) return;
 
-        // Move the existing circle to the model's position
-        this.element.cx(this.model.x).cy(this.model.y);
-        //this.element.front();
+        const { x, y } = this.sceneView.mathToScreen(this.model);
+        this.element.cx(x).cy(y);
     }
 }

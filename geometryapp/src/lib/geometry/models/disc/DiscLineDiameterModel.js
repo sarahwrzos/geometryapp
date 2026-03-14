@@ -11,6 +11,7 @@ export class DiscLineDiameterModel extends LineModel {
 
     constructor(pointModel1, pointModel2, color) {
         super(pointModel1, pointModel2, color);
+        this.type = "Line";
 
         // A diameter always passes through the origin
         this.center = new PointModel(0, 0);

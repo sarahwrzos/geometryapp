@@ -11,7 +11,7 @@ export class HalfPlaneVerticalLineModel extends LineModel {
 
     constructor(pointModel1, pointModel2, color) {
         super(pointModel1, pointModel2, color);
-
+        this.type = "Line";
         this.x = null; // x-coordinate of vertical line
 
         this.listeners = [];

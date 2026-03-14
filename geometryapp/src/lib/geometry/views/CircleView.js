@@ -3,6 +3,7 @@ import { SceneView } from "./SceneView.js";
 
 export class CircleView extends GeodesicView {
     constructor(model, sceneView, color = "black", width = 2) {
+        console.log("constructor")
         super(model, sceneView, color, width);
     }
 
@@ -19,6 +20,7 @@ export class CircleView extends GeodesicView {
             .fill('none')
             .stroke({ color: this.color, width: this.width });
 
+        this.sceneView.updateClip();
         return this.element;
     }
 

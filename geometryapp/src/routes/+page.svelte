@@ -8,6 +8,7 @@
   import { HalfPlaneSceneView } from "$lib/geometry/views/HalfPlaneSceneView.js";
   import { PointView } from "$lib/geometry/views/PointView.js";
   import { LineView } from "$lib/geometry/views/LineView.js";
+  import { CircleView } from "$lib/geometry/views/CircleView.js";
   import { AppController } from "$lib/geometry/AppController.js";
   import { DiscSceneModel } from "$lib/geometry/models/disc/DiscSceneModel";
   import { PointModel } from "$lib/geometry/models/PointModel";
@@ -40,14 +41,13 @@
       const removeBtn = document.createElement("button");
       removeBtn.textContent = "Remove";
       removeBtn.classList.add("line-action");
+
       removeBtn.style.position = "absolute";
       removeBtn.style.top = `${e.clientY}px`;
       removeBtn.style.left = `${e.clientX}px`;
+
       removeBtn.onclick = () => {
-        lineView.element.remove();
         sceneView.sceneModel.removeLine(lineView.model);
-        lineView.model.p1.view?.element.remove();
-        lineView.model.p2.view?.element.remove();
         document.querySelectorAll("button.line-action").forEach(b => b.remove());
       };
       document.body.appendChild(removeBtn);
@@ -74,10 +74,17 @@
   }
 
   function drawLine(lineModel, sceneView) {
-    const lineView = LineView.create(LineView, lineModel, sceneView);
+    console.log("line model", lineModel)
+    let lineView;
+    if (lineModel.type === "Line") {
+      console.log("linetype")
+      lineView = LineView.create(LineView, lineModel, sceneView);
+    }
+    else {
+      lineView = CircleView.create(CircleView, lineModel, sceneView);
+    }
     makeLineActions(lineView, sceneView);
     sceneView.lineViews.push(lineView);
-    console.log(sceneView.lineViews[0]);
   }
 
   function addPointAt(x, y) {
@@ -103,7 +110,6 @@
       if (!tempPoint) {
         tempPoint = newPoint;
       } else {
-        console.log("newpoint", currentSceneView.screenToMathPoint(tempPoint))
         const lineModel = currentSceneView.sceneModel.addLine(
             currentSceneView.screenToMathPoint(tempPoint.x, tempPoint.y), 
             currentSceneView.screenToMathPoint(newPoint.x, newPoint.y));

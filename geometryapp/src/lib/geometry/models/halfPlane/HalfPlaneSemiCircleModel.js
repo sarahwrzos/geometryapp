@@ -11,7 +11,7 @@ export class HalfPlaneSemiCircleModel extends LineModel {
 
     constructor(pointModel1, pointModel2, color) {
         super(pointModel1, pointModel2, color);
-
+        this.type = "Circle";
         this.center = new PointModel(0, 0);
         this.radius = null;
         this.listeners = [];

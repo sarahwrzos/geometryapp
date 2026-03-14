@@ -1,21 +1,22 @@
 export class PointView {
-    static createDraggable(model, svg, options = {}) {
+    static createDraggable(model, sceneView, options = {}) {
         // default options
         const radius = options.radius ?? 4;
         const color = options.color ?? "black";
         const highlightColor = options.highlightColor ?? "red";
         const normalColor = options.normalColor ?? color;
 
-        const view = new PointView(model, svg, radius, color);
+        const view = new PointView(model, sceneView, radius, color);
         view.draw();
         view.enableDrag();
         view.enableHover(highlightColor, normalColor);
         return view;
     }
 
-    constructor(model, svg, radius = 4, color = "black") {
+    constructor(model, sceneView, radius = 4, color = "black") {
         this.model = model;
-        this.svg = svg;
+        this.sceneView = sceneView;
+        this.svg = sceneView.svg; 
         this.radius = radius;
         this.color = color;
         this.element = null;

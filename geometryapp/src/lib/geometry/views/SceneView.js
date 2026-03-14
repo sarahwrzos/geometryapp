@@ -8,8 +8,14 @@ export class SceneView {
         this.lineViews = [];
         this._containerHeight = containerHeight;
         this._containerWidth = containerWidth;
-        this.scale = Math.min(this.containerHeight, this.containerHeight) / 2;
+        this.scale = Math.min(this.containerHeight, this.containerHeight) / 4;
 
+        this.sceneModel.addListener(this);
+
+    }
+
+    scaleLength(modelLength) {
+        return modelLength * this.scale;
     }
 
     get containerWidth() {
@@ -43,14 +49,31 @@ export class SceneView {
 
     clearAll() {
         this.pointViews.forEach(p => p.element?.remove());
-        this.geodesicViews.forEach(l => l.element?.remove());
+        this.lineViews.forEach(l => l.element?.remove());
         this.pointViews = [];
-        this.geodesicViews = [];
+        this.lineViews = [];
     }
 
     update() {
+
+        this.pointViews = this.pointViews.filter(view => {
+            if (!this.sceneModel.pointModels.includes(view.model)) {
+                view.element.remove();
+                return false;
+            }
+            return true;
+        });
+
+        this.lineViews = this.lineViews.filter(view => {
+            if (!this.sceneModel.lineModels.includes(view.model)) {
+                view.element.remove();
+                return false;
+            }
+            return true;
+        });
+
         this.pointViews.forEach(p => p.update());
-        this.geodesicViews.forEach(l => l.update());
+        this.lineViews.forEach(l => l.update());
     }
 
     mathToScreen(pointModel) {

@@ -19,7 +19,7 @@ export class DiscSceneView extends SceneView {
     createScene() {
         if (!this.svg) return;
 
-        const radius = Math.min(this.containerWidth, this.containerHeight) / 2;
+        const radius = Math.min(this.containerWidth, this.containerHeight) / 4;
         const cx = this.containerWidth / 2;
         const cy = this.containerHeight / 2;
         // Draw the circle for the scene
@@ -61,15 +61,16 @@ export class DiscSceneView extends SceneView {
     }
 
     updateClip() {
+        console.log("update clip")
         if (!this.svg) return;
 
         if (this.unitCircleClip) this.unitCircleClip.remove();
 
-        const radius = Math.min(this.containerWidth, this.containerHeight) / 2;
+        const radius = Math.min(this.containerWidth, this.containerHeight) / 4;
         const cx = this.containerWidth / 2;
         const cy = this.containerHeight / 2;
 
-        this.unitCircleClip = this.svg.clip().add(this.svg.circle(radius * 2).center(cx, cy));
+        this.unitCircleClip = this.svg.clip().add(this.svg.circle(radius).center(cx, cy));
 
         this.applyClipToElements();
     }

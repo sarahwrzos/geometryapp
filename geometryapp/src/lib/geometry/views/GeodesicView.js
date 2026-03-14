@@ -1,10 +1,11 @@
 export class GeodesicView {
     static create(ViewClass, model, sceneView, options = {}) {
+        console.log("viewclass", ViewClass);
         const color = options.color ?? "black";
         const width = options.width ?? 2;
 
         const view = new ViewClass(model, sceneView, color, width);
-
+        console.log("before draw", view)
         view.draw();
         view.enableHover(options.highlightColor ?? "red");
 

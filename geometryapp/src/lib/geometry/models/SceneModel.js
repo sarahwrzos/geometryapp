@@ -5,6 +5,15 @@ export class SceneModel {
     constructor() {
         this.lineModels = [];
         this.pointModels = [];
+        this.listeners = [];
+    }
+
+    addListener(listener) {
+        this.listeners.push(listener);
+    }
+
+    notify() {
+        this.listeners.forEach(listener => listener.update());
     }
 
     addPoint(pointModel) {
@@ -15,6 +24,7 @@ export class SceneModel {
         // Prevent duplicates
         if (!this.pointModels.includes(pointModel)) {
             this.pointModels.push(pointModel);
+            this.notify();
         }
     }
 
@@ -25,26 +35,35 @@ export class SceneModel {
 
         if (!this.lineModels.includes(lineModel)) {
             this.lineModels.push(lineModel);
+            this.notify();
         }
     }
 
-    removeLine(lineModel1) {
-        const index = this.pointModels.indexOf(pointModel);
-        if (index !== -1) {
-            this.pointModels.splice(index, 1);
-        }
-    }
-
-    removePoint(pointModel1) {
+    removeLine(lineModel) {
         const index = this.lineModels.indexOf(lineModel);
         if (index !== -1) {
             this.lineModels.splice(index, 1);
+        }
+
+        // remove the points that belong to the line
+        this.removePoint(lineModel.pointModel1);
+        this.removePoint(lineModel.pointModel2);
+
+        this.notify();
+    }
+
+    removePoint(pointModel) {
+        const index = this.pointModels.indexOf(pointModel);
+        if (index !== -1) {
+            this.pointModels.splice(index, 1);
+            this.notify();
         }
     }
 
     clearAll() {
         this.pointModels = [];
         this.lineModels = [];
+        this.notify();
     }
 
 }

@@ -51,31 +51,22 @@ export class PointView {
 
         this.element.on('dragmove', (event) => {
 
-            const cx = 0;
-            const cy = 0;
-            const r  = 1;
+            // pixel position from SVG draggable
+            const px = event.detail.box.cx;
+            const py = event.detail.box.cy;
 
-            // Proposed new position from draggable
-            let newX = event.detail.box.cx;
-            let newY = event.detail.box.cy;
+            // convert to math coordinates
+            let { x, y } = this.sceneView.screenToMath(px, py);
 
-            const dx = newX - cx;
-            const dy = newY - cy;
-            const dist = Math.hypot(dx, dy);
-
-            // clamp
-            if (dist > r) {
-                const scale = r / dist;
-                newX = cx + dx * scale;
-                newY = cy + dy * scale;
-
-                // Override the draggable's position
-                event.detail.handler.move(newX - event.detail.box.w / 2,
-                                        newY - event.detail.box.h / 2);
+            // clamp to unit disc
+            const dist = Math.hypot(x, y);
+            if (dist > 1) {
+                x /= dist;
+                y /= dist;
             }
 
-            // Update model (this triggers line updates)
-            this.model.setXY(newX, newY);
+            // update model
+            this.model.setXY(x, y);
         });
     }
 

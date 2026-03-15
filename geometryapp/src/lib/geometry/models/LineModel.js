@@ -20,6 +20,30 @@ export class LineModel {
         this.pointModel1 = pointModel1;
         this.pointModel2 = pointModel2;
         this.color = color;
+        
+        this.listeners = [];
+
+        this.pointModel1.addListener(() => {
+            this.computeGeodesic();
+            this.notify();
+        });
+
+        this.pointModel2.addListener(() => {
+            this.computeGeodesic();
+            this.notify();
+        });
+    }
+
+    computeGeodesic() {
+        throw new Error("computeGeodesic() must be implemented in subclass");
+    }
+
+    addListener(listener) {
+        this.listeners.push(listener);
+    }
+
+    notify() {
+        this.listeners.forEach(l => l());
     }
 
 }

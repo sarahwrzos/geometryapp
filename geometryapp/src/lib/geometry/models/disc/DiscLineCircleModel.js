@@ -39,7 +39,7 @@ export class DiscLineCircleModel extends LineModel {
         // Compute circle center and radius
         const d1 = x1*x1 + y1*y1;
         const d2 = x2*x2 + y2*y2;
-        const denom = 2 * (x1*y2 - y1*x2);  // should not be 0 here
+        const denom = 2 * (x1*y2 - y1*x2); 
 
         const cx = (y2*(d1 + 1) - y1*(d2 + 1)) / denom;
         const cy = (x1*(d2 + 1) - x2*(d1 + 1)) / denom;

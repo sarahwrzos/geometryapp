@@ -9,10 +9,15 @@ export class PointModel {
     setXY(newX, newY) {
         this.x = newX;
         this.y = newY;
+        this.notify();
     }
 
     addListener(fn) {
         this.listeners.push(fn);
+    }
+
+    notify() {
+        this.listeners.forEach(fn => fn());
     }
 
     // save x and y values

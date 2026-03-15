@@ -8,7 +8,7 @@ export class SceneView {
         this.lineViews = [];
         this._containerHeight = containerHeight;
         this._containerWidth = containerWidth;
-        this.scale = Math.min(this.containerHeight, this.containerHeight) / 4;
+        this.scale = Math.min(this.containerHeight, this.containerWidth) / 4;
 
         this.sceneModel.addListener(this);
 

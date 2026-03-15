@@ -34,14 +34,11 @@ export class DiscSceneModel extends SceneModel {
                 isDiameter = true;
             }
         }
-        console.log(isDiameter)
         if (isDiameter === true) {
             // Create diameter line
-            console.log("diameter")
             line = DiscLineDiameterModel.create(pointModel1, pointModel2, color);
         } else {
             // Otherwise, create a circle arc line
-            console.log("else")
             line = DiscLineCircleModel.create(pointModel1, pointModel2, color);
         }
 

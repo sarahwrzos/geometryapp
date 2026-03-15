@@ -23,9 +23,6 @@ export class LineView extends GeodesicView {
     update() {
         if (!this.element) return;
 
-        const p1 = this.sceneView.mathToScreen(this.model.pointModel1);
-        const p2 = this.sceneView.mathToScreen(this.model.pointModel2);
-
-        this.element.plot(p1.x, p1.y, p2.x, p2.y);
+        this.draw();
     }
 }

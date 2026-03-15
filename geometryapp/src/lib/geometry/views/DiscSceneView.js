@@ -61,7 +61,6 @@ export class DiscSceneView extends SceneView {
     }
 
     updateClip() {
-        console.log("update clip")
         if (!this.svg) return;
 
         if (this.unitCircleClip) this.unitCircleClip.remove();

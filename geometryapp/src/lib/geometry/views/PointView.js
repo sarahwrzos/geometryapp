@@ -36,9 +36,6 @@ export class PointView {
         this.element.cx(x).cy(y);
         this.element.fill(this.color);
 
-        this.element.on('mouseover', () => this.element.stroke({ color: 'red' }));
-        this.element.on('mouseout', () => this.element.stroke({ color: this.color }));
-
         this.element.front();
 
         return this.element;
@@ -50,24 +47,35 @@ export class PointView {
         this.element.draggable();
 
         this.element.on('dragmove', (event) => {
+        // Proposed new position from draggable
+        let newX = event.detail.box.cx;
+        let newY = event.detail.box.cy;
 
-            // pixel position from SVG draggable
-            const px = event.detail.box.cx;
-            const py = event.detail.box.cy;
+        // Convert to math coordinates for clamping
+        const { x: mathX, y: mathY } = this.sceneView.screenToMath(newX, newY);
+        const dist = Math.hypot(mathX, mathY);
 
-            // convert to math coordinates
-            let { x, y } = this.sceneView.screenToMath(px, py);
+        // Clamp in math space
+        const r = 1; // unit circle radius in math space
+        let clampedMathX = mathX;
+        let clampedMathY = mathY;
+        if (dist > r) {
+            const scale = r / dist;
+            clampedMathX *= scale;
+            clampedMathY *= scale;
+        }
 
-            // clamp to unit disc
-            const dist = Math.hypot(x, y);
-            if (dist > 1) {
-                x /= dist;
-                y /= dist;
-            }
+        // Convert back to screen coordinates
+        const { x: screenX, y: screenY } = this.sceneView.mathToScreen({ x: clampedMathX, y: clampedMathY });
 
-            // update model
-            this.model.setXY(x, y);
-        });
+        // Move the SVG element physically to clamped position
+        event.detail.handler.move(screenX - event.detail.box.w / 2,
+                                screenY - event.detail.box.h / 2);
+
+        // Update model with clamped math coordinates
+        this.model.setXY(clampedMathX, clampedMathY);
+    });
+        
     }
 
     enableHover(highlightColor = "red", normalColor = "black") {

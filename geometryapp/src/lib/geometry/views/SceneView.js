@@ -28,12 +28,14 @@ export class SceneView {
 
     set containerWidth(value) {
         this._containerWidth = value;
+        this.scale = Math.min(this.containerHeight, this.containerWidth) / 4;
         this.createScene();
         this.renderAll();
     }
 
     set containerHeight(value) {
         this._containerHeight = value;
+        this.scale = Math.min(this.containerHeight, this.containerWidth) / 4;
         this.createScene();
         this.renderAll();
     }

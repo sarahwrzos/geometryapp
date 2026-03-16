@@ -83,7 +83,7 @@
     }
     makeLineActions(lineView, sceneView);
     sceneView.lineViews.push(lineView);
-    sceneView.updateClip();
+    //sceneView.updateClip();
   }
 
   function addPointAt(x, y) {
@@ -93,7 +93,7 @@
 
     const pointView = PointView.createDraggable(mathPoint, currentSceneView);
     currentSceneView.pointViews.push(pointView);
-    currentSceneView.updateClip();
+    //currentSceneView.updateClip();
 
     return mathPoint;
   }

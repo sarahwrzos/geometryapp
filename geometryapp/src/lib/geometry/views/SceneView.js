@@ -1,4 +1,6 @@
 import { PointModel } from "../models/PointModel";
+import { DiscSceneModel } from "../models/disc/DiscSceneModel";
+import { HalfPlaneSceneModel } from "../models/halfPlane/HalfPlaneSceneModel";
 
 export class SceneView {
     constructor(sceneModel, svg, containerHeight, containerWidth) {
@@ -79,8 +81,20 @@ export class SceneView {
     }
 
     mathToScreen(pointModel) {
-        const px = this.containerWidth / 2 + pointModel.x * this.scale;
-        const py = this.containerHeight / 2 - pointModel.y * this.scale;
+        const xCenter = this.containerWidth / 2;
+        let px = xCenter + pointModel.x * this.scale;
+
+        let py;
+        if (this.sceneModel instanceof DiscSceneModel) {
+            // origin in center
+            py = this.containerHeight / 2 - pointModel.y * this.scale;
+        } else if (this.sceneModel instanceof HalfPlaneSceneModel) {
+            // origin at bottom of half-plane
+            py = this.containerHeight - pointModel.y * this.scale;
+        } else {
+            py = this.containerHeight / 2 - pointModel.y * this.scale;
+        }
+
         return { x: px, y: py };
     }
 
@@ -91,7 +105,16 @@ export class SceneView {
 
     screenToMath(px, py) {
         const x = (px - this.containerWidth / 2) / this.scale;
-        const y = (this.containerHeight / 2 - py) / this.scale;
+        let y;
+
+        if (this.sceneModel instanceof DiscSceneModel) {
+            y = (this.containerHeight / 2 - py) / this.scale;
+        } else if (this.sceneModel instanceof HalfPlaneSceneModel) {
+            y = (this.containerHeight - py) / this.scale;
+        } else {
+            y = (this.containerHeight / 2 - py) / this.scale;
+        }
+
         return { x, y };
     }
 

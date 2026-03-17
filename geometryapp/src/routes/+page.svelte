@@ -33,7 +33,7 @@ onMount(() => {
   controller =
     new AppController(draw, container);
 
-  controller.init("disc");
+  controller.init("halfPlane");
 
   draw.on("click", handleClick);
 });

@@ -37,21 +37,22 @@ export class HalfPlaneSceneView extends SceneView {
         if (this.clipRect) this.clipRect.remove();
 
         const clipHeight = (2 / 3) * this.containerHeight;
-        this.clipRect = this.svg.clip().add(this.svg.rect(this.containerWidth, clipHeight)
-            .move(0, 0)); // top-left corner at 0,0
+        this.clipRect = this.svg.clip().add(
+            this.svg.rect(this.containerWidth, this.containerHeight).move(0, 0)
+        );
 
         this.applyClipToElements();
     }
 
     applyClipToElements() {
-        if (!this.unitCircleClip) return;
+        if (!this.clipRect) return;
 
         this.pointViews.forEach(v => {
-            if (v.element) v.element.clipWith(this.unitCircleClip);
+            if (v.element) v.element.clipWith(this.clipRect);
         });
 
         this.lineViews.forEach(v => {
-            if (v.element) v.element.clipWith(this.unitCircleClip);
+            if (v.element) v.element.clipWith(this.clipRect);
         });
     }
 

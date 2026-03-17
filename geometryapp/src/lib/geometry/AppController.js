@@ -184,7 +184,6 @@ export class AppController {
     }
 
     createSceneView(type, model) {
-        console.log(model)
         let view;
         if (type === "disc") {
             view = DiscSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth);
@@ -212,34 +211,46 @@ export class AppController {
         let target = this.scenes.get(sceneType);
 
         if (!target) {
-            // Transform points into the new scene
+            // 1️⃣ Create a new model for the target scene
             let newModel;
-
             if (sceneType === "disc") {
                 newModel = new DiscSceneModel();
-            } else {
+            } else if (sceneType === "halfPlane") {
                 newModel = new HalfPlaneSceneModel();
+            } else {
+                throw new Error("Unknown scene type");
             }
 
-            let transformed;
-
+            // 2️⃣ Transform all points and store mapping old → new
+            const pointMap = new Map();
             current.model.pointModels.forEach(p => {
+                let transformed;
                 if (this.currentSceneType === "disc" && sceneType === "halfPlane") {
                     transformed = GeometryTransformer.DiscToHalfPlane(p);
                 } else if (this.currentSceneType === "halfPlane" && sceneType === "disc") {
                     transformed = GeometryTransformer.HalfPlaneToDisc(p);
                 } else {
-                    transformed = { ...p }; // same coords if same type
+                    transformed = new p.constructor(p.x, p.y); // clone the point
                 }
                 newModel.pointModels.push(transformed);
+                pointMap.set(p, transformed);
             });
 
+            // 3️⃣ Recreate lines via the new model using transformed points
+            current.model.lineModels.forEach(line => {
+                const p1 = pointMap.get(line.pointModel1);
+                const p2 = pointMap.get(line.pointModel2);
+                const newLine = newModel.addLine(p1, p2, line.color);
+            });
+
+            // 4️⃣ Create a new view for the scene
             const view = this.createSceneView(sceneType, newModel);
             this.scenes.set(sceneType, { view, model: newModel });
             target = { view, model: newModel };
-            newModel.pointModels.push(transformed);
         } else {
-            // Target exists → add any new points or lines
+            // 5️⃣ Scene already exists → add any new points and lines
+            const pointMap = new Map();
+
             const newPoints = current.model.pointModels.filter(
                 p => !target.model.pointModels.includes(p)
             );
@@ -250,29 +261,37 @@ export class AppController {
                 } else if (this.currentSceneType === "halfPlane" && sceneType === "disc") {
                     transformed = GeometryTransformer.HalfPlaneToDisc(p);
                 } else {
-                    transformed = p;
+                    transformed = new p.constructor(p.x, p.y); // clone
                 }
-
                 target.model.pointModels.push(transformed);
                 const pointView = PointView.createDraggable(transformed, target.view);
                 target.view.pointViews.push(pointView);
+                pointMap.set(p, transformed);
             });
 
-            // Similarly, add new lines
+            // Add new lines via model
             const newLines = current.model.lineModels.filter(
                 l => !target.model.lineModels.includes(l)
             );
             newLines.forEach(line => {
-                target.model.lineModels.push(line);
-                this.drawLine(line, target.view);
+                const p1 = pointMap.get(line.pointModel1) || line.pointModel1;
+                const p2 = pointMap.get(line.pointModel2) || line.pointModel2;
+                const newLine = target.model.addLine(p1, p2, line.color);
+                this.drawLine(newLine, target.view);
             });
 
             target.view.updateClip();
         }
 
-        // Hide the current scene and show the target scene
-        current.view.removeScene(); // or just hide
+        // 6️⃣ Hide the current scene and update currentSceneView
+        current.view.removeScene();
+        console.log(this.currentSceneType)
+        console.log(this.currentSceneView)
         this.currentSceneType = sceneType;
+        this.currentSceneView = target.view;
+        
+        console.log(this.currentSceneType)
+        console.log(this.currentSceneView)
     }
 
     drawLine(lineModel, sceneView = this.currentSceneView) {

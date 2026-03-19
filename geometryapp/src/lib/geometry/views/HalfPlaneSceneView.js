@@ -38,7 +38,7 @@ export class HalfPlaneSceneView extends SceneView {
 
         const clipHeight = (2 / 3) * this.containerHeight;
         this.clipRect = this.svg.clip().add(
-            this.svg.rect(this.containerWidth, this.containerHeight).move(0, 0)
+            this.svg.rect(this.containerWidth, clipHeight).move(0, 0)
         );
 
         this.applyClipToElements();

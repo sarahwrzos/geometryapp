@@ -89,8 +89,8 @@ export class SceneView {
             // origin in center
             py = this.containerHeight / 2 - pointModel.y * this.scale;
         } else if (this.sceneModel instanceof HalfPlaneSceneModel) {
-            // origin at bottom of half-plane
-            py = this.containerHeight - pointModel.y * this.scale;
+            // origin at bottom of half-plane TODO
+            py = ((2/3) * this.containerHeight) - pointModel.y * this.scale;
         } else {
             py = this.containerHeight / 2 - pointModel.y * this.scale;
         }
@@ -110,7 +110,7 @@ export class SceneView {
         if (this.sceneModel instanceof DiscSceneModel) {
             y = (this.containerHeight / 2 - py) / this.scale;
         } else if (this.sceneModel instanceof HalfPlaneSceneModel) {
-            y = (this.containerHeight - py) / this.scale;
+            y = (((2/3) * this.containerHeight) - py) / this.scale;
         } else {
             y = (this.containerHeight / 2 - py) / this.scale;
         }

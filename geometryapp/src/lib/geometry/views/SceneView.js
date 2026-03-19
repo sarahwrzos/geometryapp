@@ -1,6 +1,8 @@
 import { PointModel } from "../models/PointModel";
 import { DiscSceneModel } from "../models/disc/DiscSceneModel";
 import { HalfPlaneSceneModel } from "../models/halfPlane/HalfPlaneSceneModel";
+import { DiscSceneView } from "./DiscSceneView";
+//import { HalfPlaneSceneView } from "./HalfPlaneSceneView";
 
 export class SceneView {
     constructor(sceneModel, svg, containerHeight, containerWidth) {
@@ -13,6 +15,7 @@ export class SceneView {
         this.scale = Math.min(this.containerHeight, this.containerWidth) / 4;
 
         this.sceneModel.addListener(this);
+        console.log("SceneView size:", containerWidth, containerHeight);
 
     }
 
@@ -80,20 +83,16 @@ export class SceneView {
         this.lineViews.forEach(l => l.update());
     }
 
+    yToScreen(y) {
+        throw new Error("yToScreen must be implemented in subclass");
+    }
+
     mathToScreen(pointModel) {
         const xCenter = this.containerWidth / 2;
-        let px = xCenter + pointModel.x * this.scale;
+        const px = xCenter + pointModel.x * this.scale;
 
-        let py;
-        if (this.sceneModel instanceof DiscSceneModel) {
-            // origin in center
-            py = this.containerHeight / 2 - pointModel.y * this.scale;
-        } else if (this.sceneModel instanceof HalfPlaneSceneModel) {
-            // origin at bottom of half-plane
-            py = this.containerHeight - pointModel.y * this.scale;
-        } else {
-            py = this.containerHeight / 2 - pointModel.y * this.scale;
-        }
+        // delegate y handling
+        const py = this.yToScreen(pointModel.y);
 
         return { x: px, y: py };
     }
@@ -103,18 +102,13 @@ export class SceneView {
         return new PointModel(x, y);
     }
 
+    screenYToMath(py) {
+        throw new Error("screenYToMath must be implemented in subclass");
+    }
+
     screenToMath(px, py) {
         const x = (px - this.containerWidth / 2) / this.scale;
-        let y;
-
-        if (this.sceneModel instanceof DiscSceneModel) {
-            y = (this.containerHeight / 2 - py) / this.scale;
-        } else if (this.sceneModel instanceof HalfPlaneSceneModel) {
-            y = (this.containerHeight - py) / this.scale;
-        } else {
-            y = (this.containerHeight / 2 - py) / this.scale;
-        }
-
+        const y = this.screenYToMath(py);
         return { x, y };
     }
 

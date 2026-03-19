@@ -1,11 +1,9 @@
-import { GeometryTransformer } from "./GeometryTransformer.js";
 import { DiscSceneView } from "$lib/geometry/views/DiscSceneView.js";
 import { HalfPlaneSceneView } from "$lib/geometry/views/HalfPlaneSceneView.js";
 import { PointView } from "$lib/geometry/views/PointView.js";
 import { LineView } from "$lib/geometry/views/LineView.js";
 import { CircleView } from "$lib/geometry/views/CircleView.js";
 import { DiscSceneModel } from "./models/disc/DiscSceneModel.js";
-import { HalfPlaneSceneModel } from "./models/halfPlane/HalfPlaneSceneModel.js";
 
 export class AppController {
 
@@ -13,38 +11,23 @@ export class AppController {
         this.svg = svg;
         this.container = container;
 
+        // 🔥 SINGLE SOURCE OF TRUTH
+        this.masterModel = new DiscSceneModel();
+
+        this.currentSceneView = null;
+        this.currentSceneType = null;
+
         this.activeTool = null;
         this.tempPoint = null;
-
-        this.scenes = new Map();
-        this.currentSceneType = null;
     }
 
-    init(sceneType) {
-
-        let sceneModel;
-
-        if (sceneType === "disc") {
-            sceneModel = new DiscSceneModel();
-        }
-        else if (sceneType === "halfPlane") {
-            sceneModel = new HalfPlaneSceneModel();
-        }
-        else {
-            throw new Error("Unknown scene type");
-        }
-
-        const view = this.createSceneView(sceneType, sceneModel);
-
-        this.currentSceneView = view;
-
-        this.scenes.set(sceneType, {
-            view: view,
-            model: sceneModel
-        });
-
-        this.currentSceneType = sceneType;
+    init(sceneType = "disc") {
+        this.switchScene(sceneType);
     }
+
+    // =========================
+    // TOOL CONTROL
+    // =========================
 
     setTool(tool) {
         this.activeTool = tool;
@@ -52,12 +35,10 @@ export class AppController {
     }
 
     handleClick(x, y) {
-
         if (!this.currentSceneView) return;
 
         // POINT TOOL
         if (this.activeTool === "point") {
-
             this.addPoint(x, y);
             this.activeTool = null;
             return;
@@ -65,59 +46,61 @@ export class AppController {
 
         // LINE TOOL
         if (this.activeTool === "hyperbolicLine") {
-
             const newPoint = this.addPoint(x, y);
+            console.log(x,y )
 
-            // FIRST CLICK
             if (this.tempPoint === null) {
                 this.tempPoint = newPoint;
                 return;
             }
 
-            // SECOND CLICK
             const lineModel =
-                this.currentSceneView.sceneModel.addLine(this.tempPoint, newPoint);
+                this.masterModel.addLine(this.tempPoint, newPoint);
 
-            this.drawLine(lineModel);
+            
+            this.currentSceneView.drawLine(lineModel);
 
             this.tempPoint = null;
             this.activeTool = null;
         }
     }
 
-    addPoint(x, y) {
+    // =========================
+    // MODEL → VIEW
+    // =========================
 
+    addPoint(x, y) {
         const mathPoint =
             this.currentSceneView.screenToMathPoint(x, y);
 
-        this.currentSceneView.sceneModel.addPoint(mathPoint);
+        this.masterModel.addPoint(mathPoint);
 
         const pointView =
             PointView.createDraggable(mathPoint, this.currentSceneView);
 
         this.currentSceneView.pointViews.push(pointView);
 
-        this.currentSceneView.updateClip();  
+        this.currentSceneView.updateClip();
 
         return mathPoint;
     }
 
-    makeLineActions(lineView) {
+    // =========================
+    // LINE ACTIONS (unchanged)
+    // =========================
 
+    makeLineActions(lineView) {
         if (!lineView.element) return;
 
         const sceneView = this.currentSceneView;
 
         lineView.element.on("click", (e) => {
-
             e.stopPropagation();
 
-            document
-                .querySelectorAll("button.line-action")
+            document.querySelectorAll("button.line-action")
                 .forEach(b => b.remove());
 
             const removeBtn = document.createElement("button");
-
             removeBtn.textContent = "Remove";
             removeBtn.classList.add("line-action");
 
@@ -126,18 +109,15 @@ export class AppController {
             removeBtn.style.left = `${e.clientX}px`;
 
             removeBtn.onclick = () => {
-
-                sceneView.sceneModel.removeLine(lineView.model);
-
-                document
-                    .querySelectorAll("button.line-action")
+                this.masterModel.removeLine(lineView.model);
+                sceneView.update();
+                document.querySelectorAll("button.line-action")
                     .forEach(b => b.remove());
             };
 
             document.body.appendChild(removeBtn);
 
             const colorBtn = document.createElement("button");
-
             colorBtn.textContent = "Color";
             colorBtn.classList.add("line-action");
 
@@ -146,21 +126,14 @@ export class AppController {
             colorBtn.style.left = `${e.clientX + 60}px`;
 
             colorBtn.onclick = () => {
-
-                const newColor =
-                    prompt("Enter color:", "black");
+                const newColor = prompt("Enter color:", "black");
 
                 if (newColor) {
-
                     lineView.model.color = newColor;
-
-                    lineView.element.stroke({
-                        color: newColor
-                    });
+                    lineView.element.stroke({ color: newColor });
                 }
 
-                document
-                    .querySelectorAll("button.line-action")
+                document.querySelectorAll("button.line-action")
                     .forEach(b => b.remove());
             };
 
@@ -176,133 +149,68 @@ export class AppController {
         );
     }
 
-    clear() {
-        if (!this.currentSceneView) return;
+    // =========================
+    // SCENE SWITCHING (🔥 SIMPLE NOW)
+    // =========================
 
-        this.currentSceneView.sceneModel.clearAll();
-        //this.currentSceneView.removeScene();
-    }
-
-    createSceneView(type, model) {
-        let view;
-        if (type === "disc") {
-            view = DiscSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth);
-        } else if (type === "halfPlane") {
-            view = HalfPlaneSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth);
-        }
-
-        // Rebuild all points
-        model.pointModels.forEach(p => {
-            const pointView = PointView.createDraggable(p, view);
-            view.pointViews.push(pointView);
-        });
-
-        // Rebuild all lines
-        model.lineModels.forEach(line => this.drawLine(line, view));
-
-        view.updateClip();
-        return view;
-    }
-
-    syncTo(sceneType) {
+    switchScene(sceneType) {
         if (this.currentSceneType === sceneType) return;
 
-        const current = this.scenes.get(this.currentSceneType);
-        let target = this.scenes.get(sceneType);
-
-        if (!target) {
-            // 1️⃣ Create a new model for the target scene
-            let newModel;
-            if (sceneType === "disc") {
-                newModel = new DiscSceneModel();
-            } else if (sceneType === "halfPlane") {
-                newModel = new HalfPlaneSceneModel();
-            } else {
-                throw new Error("Unknown scene type");
-            }
-
-            // 2️⃣ Transform all points and store mapping old → new
-            const pointMap = new Map();
-            current.model.pointModels.forEach(p => {
-                let transformed;
-                if (this.currentSceneType === "disc" && sceneType === "halfPlane") {
-                    transformed = GeometryTransformer.DiscToHalfPlane(p);
-                } else if (this.currentSceneType === "halfPlane" && sceneType === "disc") {
-                    transformed = GeometryTransformer.HalfPlaneToDisc(p);
-                } else {
-                    transformed = new p.constructor(p.x, p.y); // clone the point
-                }
-                newModel.pointModels.push(transformed);
-                pointMap.set(p, transformed);
-            });
-
-            // 3️⃣ Recreate lines via the new model using transformed points
-            current.model.lineModels.forEach(line => {
-                const p1 = pointMap.get(line.pointModel1);
-                const p2 = pointMap.get(line.pointModel2);
-                const newLine = newModel.addLine(p1, p2, line.color);
-            });
-
-            // 4️⃣ Create a new view for the scene
-            const view = this.createSceneView(sceneType, newModel);
-            this.scenes.set(sceneType, { view, model: newModel });
-            target = { view, model: newModel };
-        } else {
-            // 5️⃣ Scene already exists → add any new points and lines
-            const pointMap = new Map();
-
-            const newPoints = current.model.pointModels.filter(
-                p => !target.model.pointModels.includes(p)
-            );
-            newPoints.forEach(p => {
-                let transformed;
-                if (this.currentSceneType === "disc" && sceneType === "halfPlane") {
-                    transformed = GeometryTransformer.DiscToHalfPlane(p);
-                } else if (this.currentSceneType === "halfPlane" && sceneType === "disc") {
-                    transformed = GeometryTransformer.HalfPlaneToDisc(p);
-                } else {
-                    transformed = new p.constructor(p.x, p.y); // clone
-                }
-                target.model.pointModels.push(transformed);
-                const pointView = PointView.createDraggable(transformed, target.view);
-                target.view.pointViews.push(pointView);
-                pointMap.set(p, transformed);
-            });
-
-            // Add new lines via model
-            const newLines = current.model.lineModels.filter(
-                l => !target.model.lineModels.includes(l)
-            );
-            newLines.forEach(line => {
-                const p1 = pointMap.get(line.pointModel1) || line.pointModel1;
-                const p2 = pointMap.get(line.pointModel2) || line.pointModel2;
-                const newLine = target.model.addLine(p1, p2, line.color);
-                this.drawLine(newLine, target.view);
-            });
-
-            target.view.updateClip();
+        // remove old scene
+        if (this.currentSceneView) {
+            this.currentSceneView.removeScene();
         }
 
-        // 6️⃣ Hide the current scene and update currentSceneView
-        current.view.removeScene();
-        console.log(this.currentSceneType)
-        console.log(this.currentSceneView)
+        // create new view USING SAME MODEL
+        if (sceneType === "disc") {
+            this.currentSceneView = DiscSceneView.create(
+                this.masterModel,
+                this.svg,
+                this.container.clientHeight,
+                this.container.clientWidth
+            );
+        } else if (sceneType === "halfPlane") {
+            this.currentSceneView = HalfPlaneSceneView.create(
+                this.masterModel,
+                this.svg,
+                this.container.clientHeight,
+                this.container.clientWidth
+            );
+        } else {
+            throw new Error("Unknown scene type");
+        }
+
         this.currentSceneType = sceneType;
-        this.currentSceneView = target.view;
-        
-        console.log(this.currentSceneType)
-        console.log(this.currentSceneView)
+        this.currentSceneView.appController = this;
+
+        // rebuild views from model
+        this.rebuildView();
     }
 
-    drawLine(lineModel, sceneView = this.currentSceneView) {
-        let lineView;
-        if (lineModel.type === "Line") {
-            lineView = LineView.create(LineView, lineModel, sceneView);
-        } else {
-            lineView = CircleView.create(CircleView, lineModel, sceneView);
-        }
-        sceneView.lineViews.push(lineView);
-        sceneView.appController?.makeLineActions(lineView); // keep hover/remove/color
-        sceneView.updateClip();
+    rebuildView() {
+        const view = this.currentSceneView;
+
+        // points
+        this.masterModel.pointModels.forEach(p => {
+            const pv = PointView.createDraggable(p, view);
+            view.pointViews.push(pv);
+        });
+
+        // lines
+        this.masterModel.lineModels.forEach(line => {
+            const lv = view.drawLine(line);
+            this.makeLineActions(lv);
+        });
+
+        view.updateClip();
+    }
+
+    // =========================
+    // CLEAR
+    // =========================
+
+    clear() {
+        this.masterModel.clearAll();
+        this.currentSceneView?.clearAll();
     }
 }

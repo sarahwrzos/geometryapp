@@ -1,4 +1,5 @@
 import { SceneView } from "./SceneView.js";
+import { CircleView } from "./CircleView.js";
 
 export class DiscSceneView extends SceneView {
     constructor(sceneModel, svg, containerHeight, containerWidth) {
@@ -15,11 +16,25 @@ export class DiscSceneView extends SceneView {
         return view;
     }
 
+    drawLine(lineModel) {
+        let lineView;
+        console.log("disc", lineModel.pointModel1, lineModel.pointModel2)
+        if (lineModel.type === "Line") {
+            lineView = LineView.create(LineView, lineModel, this);
+        } else {
+            lineView = CircleView.create(CircleView, lineModel, this);
+        }
+
+        this.lineViews.push(lineView);
+
+        return lineView;
+    }
+
     // Draws the unit disc and sets up the clip
     createScene() {
         if (!this.svg) return;
 
-        const radius = Math.min(this.containerWidth, this.containerHeight) / 4;
+        const radius = this.scale;
         const cx = this.containerWidth / 2;
         const cy = this.containerHeight / 2;
         // Draw the circle for the scene
@@ -84,6 +99,14 @@ export class DiscSceneView extends SceneView {
         this.lineViews.forEach(v => {
             if (v.element) v.element.clipWith(this.unitCircleClip);
         });
+    }
+
+    yToScreen(y) {
+        return this.containerHeight / 2 - y * this.scale;
+    }
+
+    screenYToMath(py) {
+        return (this.containerHeight / 2 - py) / this.scale;
     }
 
     // Call this when container resizes

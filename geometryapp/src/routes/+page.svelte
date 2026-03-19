@@ -12,7 +12,6 @@ let controller;
 let saveName = "default";
 
 function handleClick(event) {
-
   const pt = draw.node.createSVGPoint();
 
   pt.x = event.clientX;
@@ -25,7 +24,6 @@ function handleClick(event) {
 }
 
 onMount(() => {
-
   draw =
     SVG().addTo(container)
       .size(container.clientWidth, container.clientHeight);
@@ -33,11 +31,11 @@ onMount(() => {
   controller =
     new AppController(draw, container);
 
-  controller.init("halfPlane");
+  // ✅ you can start in either
+  controller.init("disc");
 
   draw.on("click", handleClick);
 });
-
 </script>
 
 <div style="position:absolute;top:10px;left:10px;z-index:1000">
@@ -52,11 +50,12 @@ Draw Point
 Draw Hyperbolic Line
 </button>
 
-<button on:click={() => controller.syncTo("disc")}>
+<!-- 🔥 CHANGED HERE -->
+<button on:click={() => controller.switchScene("disc")}>
 Switch to Poincare Disk Model
 </button>
 
-<button on:click={() => controller.syncTo("halfPlane")}>
+<button on:click={() => controller.switchScene("halfPlane")}>
 Switch to Upper Half Plane Model
 </button>
 

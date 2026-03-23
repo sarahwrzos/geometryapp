@@ -272,7 +272,7 @@ export class AppController {
             lineView = CircleView.create(CircleView, lineModel, sceneView);
         }
         sceneView.lineViews.push(lineView);
-        sceneView.appController?.makeLineActions(lineView); // keep hover/remove/color
+        this.makeLineActions(lineView); // keep hover/remove/color
         sceneView.updateClip();
     }
 }

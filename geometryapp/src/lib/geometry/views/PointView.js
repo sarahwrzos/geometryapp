@@ -47,35 +47,23 @@ export class PointView {
         this.element.draggable();
 
         this.element.on('dragmove', (event) => {
-        // Proposed new position from draggable
-        let newX = event.detail.box.cx;
-        let newY = event.detail.box.cy;
+            let newX = event.detail.box.cx;
+            let newY = event.detail.box.cy;
 
-        // Convert to math coordinates for clamping
-        const { x: mathX, y: mathY } = this.sceneView.screenToMath(newX, newY);
-        const dist = Math.hypot(mathX, mathY);
+            const { x: mathX, y: mathY } = this.sceneView.screenToMath(newX, newY);
 
-        // Clamp in math space
-        const r = 1; // unit circle radius in math space
-        let clampedMathX = mathX;
-        let clampedMathY = mathY;
-        if (dist > r) {
-            const scale = r / dist;
-            clampedMathX *= scale;
-            clampedMathY *= scale;
-        }
+            const { x: screenX, y: screenY } = this.sceneView.mathToScreen({
+                x: mathX,
+                y: mathY
+            });
 
-        // Convert back to screen coordinates
-        const { x: screenX, y: screenY } = this.sceneView.mathToScreen({ x: clampedMathX, y: clampedMathY });
+            event.detail.handler.move(
+                screenX - event.detail.box.w / 2,
+                screenY - event.detail.box.h / 2
+            );
 
-        // Move the SVG element physically to clamped position
-        event.detail.handler.move(screenX - event.detail.box.w / 2,
-                                screenY - event.detail.box.h / 2);
-
-        // Update model with clamped math coordinates
-        this.model.setXY(clampedMathX, clampedMathY);
-    });
-        
+            this.model.setXY(mathX, mathY);
+        });
     }
 
     enableHover(highlightColor = "red", normalColor = "black") {

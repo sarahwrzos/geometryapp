@@ -17,6 +17,8 @@ export class HalfPlaneSemiCircleModel extends LineModel {
         this.listeners = [];
     }
 
+    
+
     computeGeodesic() {
         if (!this.pointModel1 || !this.pointModel2) {
             throw new Error("Cannot compute geodesic without two points");
@@ -28,9 +30,9 @@ export class HalfPlaneSemiCircleModel extends LineModel {
         const y2 = this.pointModel2.y;
 
         // Vertical lines are handled by a different model
-        if (x1 === x2) {
-            throw new Error("Points define a vertical geodesic, not a semicircle");
-        }
+        // if (x1 === x2) {
+        //     throw new Error("Points define a vertical geodesic, not a semicircle");
+        // }
 
         // Solve for center on x-axis (cy = 0)
         const cx = (x1*x1 + y1*y1 - x2*x2 - y2*y2) / (2 * (x1 - x2));

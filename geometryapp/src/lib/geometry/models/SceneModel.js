@@ -24,6 +24,11 @@ export class SceneModel {
         // Prevent duplicates
         if (!this.pointModels.includes(pointModel)) {
             this.pointModels.push(pointModel);
+
+            pointModel.addListener(() => {
+                this.notify();
+            });
+
             this.notify();
         }
     }

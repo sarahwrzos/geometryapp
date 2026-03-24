@@ -1,8 +1,8 @@
 import { SceneView } from "./SceneView.js";
 
 export class DiscSceneView extends SceneView {
-    constructor(sceneModel, svg, containerHeight, containerWidth) {
-        super(sceneModel, svg, containerHeight, containerWidth);
+    constructor(sceneModel, svg, containerHeight, containerWidth, controller) {
+        super(sceneModel, svg, containerHeight, containerWidth, controller);
         this.unitCircleClip = null;
         this.circleElement = null; // the actual SVG circle for display
     }

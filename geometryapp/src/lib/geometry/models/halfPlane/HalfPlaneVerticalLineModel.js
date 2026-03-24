@@ -22,9 +22,9 @@ export class HalfPlaneVerticalLineModel extends LineModel {
             throw new Error("Cannot compute geodesic without two points");
         }
 
-        if (this.pointModel1.x !== this.pointModel2.x) {
-            throw new Error("Points do not define a vertical line");
-        }
+        // if (this.pointModel1.x !== this.pointModel2.x) {
+        //     throw new Error("Points do not define a vertical line");
+        // }
 
         this.x = this.pointModel1.x;
     }

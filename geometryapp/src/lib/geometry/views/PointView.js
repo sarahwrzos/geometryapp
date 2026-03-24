@@ -51,7 +51,7 @@ export class PointView {
             let newY = event.detail.box.cy;
 
             const { x: mathX, y: mathY } = this.sceneView.screenToMath(newX, newY);
-
+            
             const { x: screenX, y: screenY } = this.sceneView.mathToScreen({
                 x: mathX,
                 y: mathY

@@ -26,10 +26,13 @@ export class HalfPlaneSceneModel extends SceneModel {
 
         // Vertical geodesic case
         if (Math.abs(dx) < EPS) {
+            console.log("vertical")
             line = HalfPlaneVerticalLineModel.create(pointModel1, pointModel2, color);
         }
         // Circular geodesic case
+
         else {
+            console.log("normal")
             line = HalfPlaneSemiCircleModel.create(pointModel1, pointModel2, color);
         }
 

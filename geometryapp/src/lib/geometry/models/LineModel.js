@@ -34,6 +34,20 @@ export class LineModel {
         });
     }
 
+    getType() {
+        const p1 = this.pointModel1;
+        const p2 = this.pointModel2;
+
+        const isVerticalLine = Math.abs(p1.x - p2.x) < 1e-6;
+
+        if (isVerticalLine) {
+            console.log("is line");
+            return "Line";
+        }
+
+        return "Circle";
+    }
+
     computeGeodesic() {
         throw new Error("computeGeodesic() must be implemented in subclass");
     }

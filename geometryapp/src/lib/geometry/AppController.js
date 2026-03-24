@@ -78,7 +78,7 @@ export class AppController {
             const lineModel =
                 this.currentSceneView.sceneModel.addLine(this.tempPoint, newPoint);
 
-            this.drawLine(lineModel);
+            //this.drawLine(lineModel);
 
             this.tempPoint = null;
             this.activeTool = null;
@@ -187,10 +187,10 @@ export class AppController {
         console.log("here")
         let view;
         if (type === "disc") {
-            view = DiscSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth);
+            view = DiscSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth, this);
             view.createScene();
         } else if (type === "halfPlane") {
-            view = HalfPlaneSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth);
+            view = HalfPlaneSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth, this);
             view.createScene();
         }
 
@@ -201,7 +201,7 @@ export class AppController {
         });
 
         // Rebuild all lines
-        model.lineModels.forEach(line => this.drawLine(line, view));
+        //model.lineModels.forEach(line => this.drawLine(line, view));
 
         view.updateClip();
         return view;
@@ -266,9 +266,11 @@ export class AppController {
 
     drawLine(lineModel, sceneView = this.currentSceneView) {
         let lineView;
-        if (lineModel.type === "Line") {
+        if (lineModel.getType() === "Line") {
+            console.log("in not else")
             lineView = LineView.create(LineView, lineModel, sceneView);
         } else {
+            console.log("in else")
             lineView = CircleView.create(CircleView, lineModel, sceneView);
         }
         sceneView.lineViews.push(lineView);

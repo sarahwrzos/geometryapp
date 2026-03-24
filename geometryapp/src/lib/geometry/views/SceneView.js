@@ -1,9 +1,11 @@
 import { PointModel } from "../models/PointModel";
 import { DiscSceneModel } from "../models/disc/DiscSceneModel";
 import { HalfPlaneSceneModel } from "../models/halfPlane/HalfPlaneSceneModel";
+import { LineView } from "./LineView";
+import { CircleView } from "./CircleView";
 
 export class SceneView {
-    constructor(sceneModel, svg, containerHeight, containerWidth) {
+    constructor(sceneModel, svg, containerHeight, containerWidth, controller) {
         this.sceneModel = sceneModel;
         this.svg = svg;
         this.pointViews = [];
@@ -11,6 +13,7 @@ export class SceneView {
         this._containerHeight = containerHeight;
         this._containerWidth = containerWidth;
         this.scale = Math.min(this.containerHeight, this.containerWidth) / 4;
+        this.controller = controller;
 
         this.sceneModel.addListener(this);
 
@@ -59,25 +62,90 @@ export class SceneView {
     }
 
     update() {
+        const oldViews = this.lineViews;
 
-        this.pointViews = this.pointViews.filter(view => {
-            if (!this.sceneModel.pointModels.includes(view.model)) {
-                view.element.remove();
-                return false;
+        this.lineViews = this.sceneModel.lineModels.map(model => {
+            let existing = oldViews.find(v => v.model === model);
+
+            const type = model.getType();
+            console.log(type)
+            let shouldBeCircle = (type === "Circle"); // make sure this matches your model
+
+            if (existing) {
+                const isCircleView = existing instanceof CircleView;
+
+                if (shouldBeCircle !== isCircleView) {
+                    existing.element?.remove();
+                    existing = null;
+                }
             }
-            return true;
+
+            if (!existing) {
+                // Determine which view class to use
+                const ViewClass = shouldBeCircle ? CircleView : LineView;
+
+                // Create the view
+                existing = new ViewClass(model, this);
+
+                // Draw it immediately
+                existing.draw();
+
+                this.lineViews.push(existing);
+
+                // Set up line actions if we have a controller
+                if (this.controller) {
+                    this.controller.makeLineActions(existing);
+                }
+            } else {
+                // Update the existing view
+                existing.update();
+            }
+
+            return existing;
         });
 
-        this.lineViews = this.lineViews.filter(view => {
-            if (!this.sceneModel.lineModels.includes(view.model)) {
-                view.element.remove();
-                return false;
+        // cleanup removed views
+        oldViews.forEach(v => {
+            if (!this.lineViews.includes(v)) {
+                v.element?.remove();
             }
-            return true;
         });
+    }
 
-        this.pointViews.forEach(p => p.update());
-        this.lineViews.forEach(l => l.update());
+    getLineEndpoints(p1, p2) {
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+
+        const xmin = 0;
+        const xmax = this.containerWidth;
+        const ymin = 0;
+        const ymax = this.containerHeight;
+
+        let points = [];
+
+        if (dx !== 0) {
+            let t = (xmin - p1.x) / dx;
+            let y = p1.y + t * dy;
+            if (y >= ymin && y <= ymax) points.push({ x: xmin, y });
+
+            t = (xmax - p1.x) / dx;
+            y = p1.y + t * dy;
+            if (y >= ymin && y <= ymax) points.push({ x: xmax, y });
+        }
+
+        if (dy !== 0) {
+            let t = (ymin - p1.y) / dy;
+            let x = p1.x + t * dx;
+            if (x >= xmin && x <= xmax) points.push({ x, y: ymin });
+
+            t = (ymax - p1.y) / dy;
+            x = p1.x + t * dx;
+            if (x >= xmin && x <= xmax) points.push({ x, y: ymax });
+        }
+
+        if (points.length < 2) return null;
+
+        return { a: points[0], b: points[1] };
     }
 
     mathToScreen(pointModel) {

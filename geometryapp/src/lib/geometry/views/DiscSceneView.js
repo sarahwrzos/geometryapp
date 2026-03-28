@@ -1,15 +1,15 @@
 import { SceneView } from "./SceneView.js";
 
 export class DiscSceneView extends SceneView {
-    constructor(sceneModel, svg, containerHeight, containerWidth, controller) {
-        super(sceneModel, svg, containerHeight, containerWidth, controller);
+    constructor(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex = 0, sceneCount = 2) {
+        super(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex, sceneCount);
         this.unitCircleClip = null;
         this.circleElement = null; // the actual SVG circle for display
     }
 
     // Factory method
-    static create(sceneModel, svg, containerHeight, containerWidth ) {
-        const view = new DiscSceneView(sceneModel, svg, containerHeight, containerWidth);
+    static create(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex = 0, sceneCount = 2 ) {
+        const view = new DiscSceneView(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex, sceneCount);
 
         view.createScene(); // actually draw the unit disc and clip
         return view;
@@ -19,8 +19,9 @@ export class DiscSceneView extends SceneView {
     createScene() {
         if (!this.svg) return;
 
-        const radius = Math.min(this.containerWidth, this.containerHeight) / 4;
-        const cx = this.containerWidth / 2;
+        const { xmin, sceneWidth } = this.getSceneXBounds();
+        const radius = Math.min(sceneWidth, this.containerHeight) / 4;
+        const cx = xmin + sceneWidth / 2;
         const cy = this.containerHeight / 2;
         // Draw the circle for the scene
         if (this.circleElement) this.circleElement.remove(); // remove old if exists
@@ -34,6 +35,8 @@ export class DiscSceneView extends SceneView {
     }
 
     removeScene() {
+        this.deactivate();
+
         // Remove the main circle
         if (this.circleElement) {
             this.circleElement.remove();
@@ -65,8 +68,9 @@ export class DiscSceneView extends SceneView {
 
         if (this.unitCircleClip) this.unitCircleClip.remove();
 
-        const radius = Math.min(this.containerWidth, this.containerHeight) / 4;
-        const cx = this.containerWidth / 2;
+        const { xmin, sceneWidth } = this.getSceneXBounds();
+        const radius = Math.min(sceneWidth, this.containerHeight) / 4;
+        const cx = xmin + sceneWidth / 2;
         const cy = this.containerHeight / 2;
 
         this.unitCircleClip = this.svg.clip().add(this.svg.circle(radius * 2).center(cx, cy));

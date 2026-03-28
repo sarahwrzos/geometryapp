@@ -70,12 +70,12 @@ Draw Point
 Draw Hyperbolic Line
 </button>
 
-<button on:click={() => controller.syncTo("disc")}>
-Switch to Poincare Disk Model
+<button on:click={() => controller.syncTo()}>
+Sync
 </button>
 
-<button on:click={() => controller.syncTo("halfPlane")}>
-Switch to Upper Half Plane Model
+<button on:click={() => controller.switchSides()}>
+Switch Sides
 </button>
 
 <button on:click={() => controller.clear()}>

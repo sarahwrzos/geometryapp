@@ -47,4 +47,51 @@ export class DiscSceneModel extends SceneModel {
 
         return line;
     }
+
+    handleLineUpdate(lineModel) {
+        const EPS = 1e-2;
+
+        const dx = lineModel.pointModel2.x - lineModel.pointModel1.x;
+        const dy = lineModel.pointModel2.y - lineModel.pointModel1.y;
+
+        let isDiameter = false;
+
+        if (Math.abs(dx) < EPS) {
+            if (Math.abs(lineModel.pointModel1.x) < EPS) {
+                isDiameter = true;
+            }
+        } else {
+            const m = dy / dx;
+            const b = lineModel.pointModel1.y - m * lineModel.pointModel1.x;
+            if (Math.abs(b) < EPS) {
+                isDiameter = true;
+            }
+        }
+
+        if (isDiameter && lineModel.type !== "Line") {
+            const newModel = DiscLineDiameterModel.create(
+                lineModel.pointModel1,
+                lineModel.pointModel2,
+                lineModel.color,
+                this
+            );
+            newModel.id = lineModel.id;
+            this.replaceLine(lineModel, newModel);
+            return;
+        }
+
+        if (!isDiameter && lineModel.type !== "Circle") {
+            const newModel = DiscLineCircleModel.create(
+                lineModel.pointModel1,
+                lineModel.pointModel2,
+                lineModel.color,
+                this
+            );
+            newModel.id = lineModel.id;
+            this.replaceLine(lineModel, newModel);
+            return;
+        }
+
+        lineModel.computeGeodesic?.();
+    }
 }

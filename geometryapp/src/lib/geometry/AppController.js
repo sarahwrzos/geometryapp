@@ -18,6 +18,9 @@ export class AppController {
 
         this.scenes = new Map();
         this.currentSceneType = null;
+        this.secondarySceneView = null;
+        this.rightSceneType = null;
+        this.rightSceneModel = null;
     }
 
     init(sceneType) {
@@ -55,6 +58,10 @@ export class AppController {
 
         if (!this.currentSceneView) return;
 
+        const sceneCount = this.currentSceneView.sceneCount ?? 1;
+        const editableWidth = this.container.clientWidth / sceneCount;
+        if (x > editableWidth) return;
+
         // POINT TOOL
         if (this.activeTool === "point") {
 
@@ -77,6 +84,8 @@ export class AppController {
             // SECOND CLICK
             const lineModel =
                 this.currentSceneView.sceneModel.addLine(this.tempPoint, newPoint);
+
+            this.currentSceneView.updateClip();
 
             //this.drawLine(lineModel);
 
@@ -185,12 +194,24 @@ export class AppController {
 
     createSceneView(type, model) {
         let view;
+
+        if (this.secondarySceneView) {
+            this.secondarySceneView.removeScene();
+            this.secondarySceneView = null;
+        }
+
         if (type === "disc") {
-            view = DiscSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth, this);
-            view.createScene();
+            view = DiscSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth, this, 0, 2);
+            const rightModel = new HalfPlaneSceneModel();
+            this.secondarySceneView = HalfPlaneSceneView.create(rightModel, this.svg, this.container.clientHeight, this.container.clientWidth, null, 1, 2);
+            this.rightSceneType = "halfPlane";
+            this.rightSceneModel = rightModel;
         } else if (type === "halfPlane") {
-            view = HalfPlaneSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth, this);
-            view.createScene();
+            view = HalfPlaneSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth, this, 0, 2);
+            const rightModel = new DiscSceneModel();
+            this.secondarySceneView = DiscSceneView.create(rightModel, this.svg, this.container.clientHeight, this.container.clientWidth, null, 1, 2);
+            this.rightSceneType = "disc";
+            this.rightSceneModel = rightModel;
         }
 
         // Rebuild all points
@@ -206,64 +227,167 @@ export class AppController {
         return view;
     }
 
-    syncTo(sceneType) {
-        console.log(this.currentSceneView.lineViews)
-        if (this.currentSceneType === sceneType) return;
-
-        const current = this.scenes.get(this.currentSceneType);
-
-        // 1️⃣ Create a brand new model for the target scene
-        let newModel;
-        if (sceneType === "disc") {
-            newModel = new DiscSceneModel();
-        } else if (sceneType === "halfPlane") {
-            newModel = new HalfPlaneSceneModel();
+    transformModel(sourceModel, sourceType, targetType) {
+        let targetModel;
+        if (targetType === "disc") {
+            targetModel = new DiscSceneModel();
+        } else if (targetType === "halfPlane") {
+            targetModel = new HalfPlaneSceneModel();
         } else {
             throw new Error("Unknown scene type");
         }
 
-        // 2️⃣ Transform points from current model → new model
         const pointMap = new Map();
 
-        current.model.pointModels.forEach(p => {
+        sourceModel.pointModels.forEach(p => {
             let transformed;
 
-            if (this.currentSceneType === "disc" && sceneType === "halfPlane") {
+            if (sourceType === "disc" && targetType === "halfPlane") {
                 transformed = GeometryTransformer.DiscToHalfPlane(p);
-            } else if (this.currentSceneType === "halfPlane" && sceneType === "disc") {
+            } else if (sourceType === "halfPlane" && targetType === "disc") {
                 transformed = GeometryTransformer.HalfPlaneToDisc(p);
             } else {
                 transformed = new p.constructor(p.x, p.y);
             }
 
-            newModel.pointModels.push(transformed);
+            targetModel.pointModels.push(transformed);
             pointMap.set(p, transformed);
         });
 
-        // 3️⃣ Recreate lines using transformed points
-        current.model.lineModels.forEach(line => {
+        sourceModel.lineModels.forEach(line => {
             const p1 = pointMap.get(line.pointModel1);
             const p2 = pointMap.get(line.pointModel2);
-            newModel.addLine(p1, p2, line.color);
+            targetModel.addLine(p1, p2, line.color);
         });
 
-        // 4️⃣ Create a fresh view (this rebuilds the base scene correctly)
-        const newView = this.createSceneView(sceneType, newModel);
+        return targetModel;
+    }
+
+    createRightSceneView(type, model) {
+        if (this.secondarySceneView) {
+            this.secondarySceneView.removeScene();
+            this.secondarySceneView = null;
+        }
+
+        if (type === "disc") {
+            this.secondarySceneView = DiscSceneView.create(
+                model,
+                this.svg,
+                this.container.clientHeight,
+                this.container.clientWidth,
+                null,
+                1,
+                2
+            );
+        } else if (type === "halfPlane") {
+            this.secondarySceneView = HalfPlaneSceneView.create(
+                model,
+                this.svg,
+                this.container.clientHeight,
+                this.container.clientWidth,
+                null,
+                1,
+                2
+            );
+        } else {
+            throw new Error("Unknown scene type");
+        }
+
+        model.pointModels.forEach(p => {
+            const pointView = new PointView(p, this.secondarySceneView);
+            pointView.draw();
+            this.secondarySceneView.pointViews.push(pointView);
+        });
+
+        this.secondarySceneView.update();
+        this.secondarySceneView.updateClip();
+
+        this.rightSceneType = type;
+        this.rightSceneModel = model;
+    }
+
+    syncTo(sceneType) {
+        if (!sceneType) {
+            sceneType = this.currentSceneType === "disc" ? "halfPlane" : "disc";
+        }
+
+        const current = this.scenes.get(this.currentSceneType);
+
+        const newModel = this.transformModel(current.model, this.currentSceneType, sceneType);
+
+        // 4️⃣ Rebuild only the right-side scene from transformed data
+        this.createRightSceneView(sceneType, newModel);
 
         // 5️⃣ Store new scene
         this.scenes.set(sceneType, {
-            view: newView,
+            view: this.secondarySceneView,
             model: newModel
         });
+    }
 
-        // 6️⃣ Remove old scene
-        current.view.removeScene();
+    switchSides() {
+        if (!this.currentSceneView || !this.rightSceneModel || !this.rightSceneType) return;
 
-        // 7️⃣ Update current references
-        this.currentSceneType = sceneType;
-        this.currentSceneView = newView;
+        const newLeftType = this.rightSceneType;
+        const newLeftModel = this.rightSceneModel;
+        const newRightType = this.currentSceneType;
+        const newRightModel = this.transformModel(newLeftModel, newLeftType, newRightType);
 
-        this.currentSceneView.update();
+        this.currentSceneView.removeScene();
+        if (this.secondarySceneView) {
+            this.secondarySceneView.removeScene();
+            this.secondarySceneView = null;
+        }
+
+        let newLeftView;
+        if (newLeftType === "disc") {
+            newLeftView = DiscSceneView.create(
+                newLeftModel,
+                this.svg,
+                this.container.clientHeight,
+                this.container.clientWidth,
+                this,
+                0,
+                2
+            );
+        } else if (newLeftType === "halfPlane") {
+            newLeftView = HalfPlaneSceneView.create(
+                newLeftModel,
+                this.svg,
+                this.container.clientHeight,
+                this.container.clientWidth,
+                this,
+                0,
+                2
+            );
+        } else {
+            throw new Error("Unknown scene type");
+        }
+
+        newLeftModel.pointModels.forEach(p => {
+            const pointView = PointView.createDraggable(p, newLeftView);
+            newLeftView.pointViews.push(pointView);
+        });
+
+        newLeftView.update();
+        newLeftView.updateClip();
+
+        this.currentSceneView = newLeftView;
+        this.currentSceneType = newLeftType;
+        this.tempPoint = null;
+        this.activeTool = null;
+
+        this.createRightSceneView(newRightType, newRightModel);
+
+        this.scenes.set(newLeftType, {
+            view: this.currentSceneView,
+            model: newLeftModel
+        });
+
+        this.scenes.set(newRightType, {
+            view: this.secondarySceneView,
+            model: newRightModel
+        });
     }
 
     drawLine(lineModel, sceneView = this.currentSceneView) {

@@ -5,14 +5,17 @@ import { LineView } from "./LineView";
 import { CircleView } from "./CircleView";
 
 export class SceneView {
-    constructor(sceneModel, svg, containerHeight, containerWidth, controller) {
+    constructor(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex = 0, sceneCount = 2) {
         this.sceneModel = sceneModel;
         this.svg = svg;
         this.pointViews = [];
         this.lineViews = [];
+        this.isActive = true;
+        this.sceneIndex = sceneIndex;
+        this.sceneCount = sceneCount;
         this._containerHeight = containerHeight;
         this._containerWidth = containerWidth;
-        this.scale = Math.min(this.containerHeight, this.containerWidth) / 4;
+        this.scale = Math.min(this.containerHeight, this.getSceneWidth()) / 4;
         this.controller = controller;
 
         this.sceneModel.addListener(this);
@@ -33,23 +36,40 @@ export class SceneView {
 
     set containerWidth(value) {
         this._containerWidth = value;
-        this.scale = Math.min(this.containerHeight, this.containerWidth) / 4;
+        this.scale = Math.min(this.containerHeight, this.getSceneWidth()) / 4;
         this.createScene();
         this.renderAll();
     }
 
     set containerHeight(value) {
         this._containerHeight = value;
-        this.scale = Math.min(this.containerHeight, this.containerWidth) / 4;
+        this.scale = Math.min(this.containerHeight, this.getSceneWidth()) / 4;
         this.createScene();
         this.renderAll();
+    }
+
+    getSceneWidth() {
+        return this.containerWidth / this.sceneCount;
+    }
+
+    getSceneXBounds() {
+        const sceneWidth = this.getSceneWidth();
+        const xmin = this.sceneIndex * sceneWidth;
+        const xmax = xmin + sceneWidth;
+
+        return { xmin, xmax, sceneWidth };
     }
 
     createScene() {
         throw new Error("createScene must be implemented by subclasses");
     }
 
+    deactivate() {
+        this.isActive = false;
+    }
+
     renderAll() {
+        if (!this.isActive) return;
         this.pointViews.forEach(p => p.draw());
         this.lineViews.forEach(l => l.draw());
     }
@@ -62,6 +82,8 @@ export class SceneView {
     }
 
     update() {
+        if (!this.isActive) return;
+
         const modelToView = new Map();
 
         // build lookup from existing views
@@ -116,8 +138,7 @@ export class SceneView {
         const dx = p2.x - p1.x;
         const dy = p2.y - p1.y;
 
-        const xmin = 0;
-        const xmax = this.containerWidth;
+        const { xmin, xmax } = this.getSceneXBounds();
         const ymin = 0;
         const ymax = this.containerHeight;
 
@@ -149,7 +170,8 @@ export class SceneView {
     }
 
     mathToScreen(pointModel) {
-        const xCenter = this.containerWidth / 2;
+        const { xmin, sceneWidth } = this.getSceneXBounds();
+        const xCenter = xmin + sceneWidth / 2;
         let px = xCenter + pointModel.x * this.scale;
 
         let py;
@@ -172,7 +194,9 @@ export class SceneView {
     }
 
     screenToMath(px, py) {
-        const x = (px - this.containerWidth / 2) / this.scale;
+        const { xmin, sceneWidth } = this.getSceneXBounds();
+        const xCenter = xmin + sceneWidth / 2;
+        const x = (px - xCenter) / this.scale;
         let y;
 
         if (this.sceneModel instanceof DiscSceneModel) {

@@ -1,15 +1,15 @@
 import { SceneView } from "./SceneView.js";
 
 export class HalfPlaneSceneView extends SceneView {
-    constructor(sceneModel, svg, containerHeight, containerWidth, controller) {
-        super(sceneModel, svg, containerHeight, containerWidth, controller);
+    constructor(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex = 0, sceneCount = 2) {
+        super(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex, sceneCount);
         this.baseLineElement = null;   // horizontal line at 2/3 height
         this.clipRect = null;          // SVG rectangle clip for top 2/3
     }
 
     // Factory method
-    static create(sceneModel, svg, containerHeight, containerWidth) {
-        const view = new HalfPlaneSceneView(sceneModel, svg, containerHeight, containerWidth);
+    static create(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex = 0, sceneCount = 2) {
+        const view = new HalfPlaneSceneView(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex, sceneCount);
         view.createScene();
         return view;
     }
@@ -19,12 +19,13 @@ export class HalfPlaneSceneView extends SceneView {
         if (!this.svg) return;
 
         const y = (2 / 3) * this.containerHeight;
+        const { xmin, xmax } = this.getSceneXBounds();
 
         // Remove old line if it exists
         if (this.baseLineElement) this.baseLineElement.remove();
 
         // Draw base horizontal line
-        this.baseLineElement = this.svg.line(0, y, this.containerWidth, y)
+        this.baseLineElement = this.svg.line(xmin, y, xmax, y)
             .stroke({ color: "black", width: 2 });
 
         // Create clip rectangle for top 2/3
@@ -36,9 +37,10 @@ export class HalfPlaneSceneView extends SceneView {
 
         if (this.clipRect) this.clipRect.remove();
 
+        const { xmin, sceneWidth } = this.getSceneXBounds();
         const clipHeight = (2 / 3) * this.containerHeight;
         this.clipRect = this.svg.clip().add(
-            this.svg.rect(this.containerWidth, clipHeight).move(0, 0)
+            this.svg.rect(sceneWidth, clipHeight).move(xmin, 0)
         );
 
         this.applyClipToElements();
@@ -57,6 +59,8 @@ export class HalfPlaneSceneView extends SceneView {
     }
 
     removeScene() {
+        this.deactivate();
+
         if (this.baseLineElement) {
             this.baseLineElement.remove();
             this.baseLineElement = null;

@@ -62,55 +62,55 @@ export class SceneView {
     }
 
     update() {
-        const oldViews = this.lineViews;
+        const modelToView = new Map();
 
-        this.lineViews = this.sceneModel.lineModels.map(model => {
-            let existing = oldViews.find(v => v.model === model);
+        // build lookup from existing views
+        for (const view of this.lineViews) {
+            modelToView.set(view.model.id, view);
+        }
 
-            const type = model.getType();
-            console.log(type)
-            let shouldBeCircle = (type === "Circle"); // make sure this matches your model
+        const newViews = [];
 
-            if (existing) {
-                const isCircleView = existing instanceof CircleView;
+        for (const model of this.sceneModel.lineModels) {
 
-                if (shouldBeCircle !== isCircleView) {
-                    existing.element?.remove();
-                    existing = null;
-                }
+            let existing = modelToView.get(model.id);
+
+            const shouldBeCircle = model.type === "Circle";
+            const isCircleView = existing instanceof CircleView;
+
+            if (existing && (shouldBeCircle !== isCircleView)) {
+                //console.log("SWITCHING VIEW TYPE");
+
+                existing.element?.remove();
+                existing = null;
             }
 
             if (!existing) {
-                // Determine which view class to use
                 const ViewClass = shouldBeCircle ? CircleView : LineView;
 
-                // Create the view
                 existing = new ViewClass(model, this);
-
-                // Draw it immediately
                 existing.draw();
 
-                this.lineViews.push(existing);
-
-                // Set up line actions if we have a controller
                 if (this.controller) {
                     this.controller.makeLineActions(existing);
                 }
             } else {
-                // Update the existing view
                 existing.update();
             }
 
-            return existing;
-        });
+            newViews.push(existing);
+        }
 
-        // cleanup removed views
-        oldViews.forEach(v => {
-            if (!this.lineViews.includes(v)) {
-                v.element?.remove();
+        // cleanup views not reused
+        for (const oldView of this.lineViews) {
+            if (!newViews.includes(oldView)) {
+                oldView.element?.remove();
             }
-        });
+        }
+
+        this.lineViews = newViews;
     }
+
 
     getLineEndpoints(p1, p2) {
         const dx = p2.x - p1.x;

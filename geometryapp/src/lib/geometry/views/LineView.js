@@ -8,6 +8,7 @@ export class LineView extends GeodesicView {
     }
 
     draw() {
+        
         const p1 = this.sceneView.mathToScreen(this.model.pointModel1);
         const p2 = this.sceneView.mathToScreen(this.model.pointModel2);
 
@@ -15,20 +16,20 @@ export class LineView extends GeodesicView {
         if (!endpoints) return;
 
         const { a, b } = endpoints;
-
         if (!this.element) {
             this.element = this.sceneView.svg.line(a.x, a.y, b.x, b.y)
                 .stroke({ color: this.color, width: this.width });
         } else {
             this.element.plot(a.x, a.y, b.x, b.y);
         }
-
+        //console.log(this.sceneView.lineViews)
+        //this.element.front();
         return this.element;
+        
     }
 
     update() {
         if (!this.element) return;
-        console.log("update")
         this.draw();
     }
 }

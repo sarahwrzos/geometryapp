@@ -2,6 +2,7 @@ import { PointModel } from '../PointModel.js';
 import { SceneModel } from '../SceneModel.js';
 import { HalfPlaneSemiCircleModel } from './HalfPlaneSemiCircleModel.js';
 import { HalfPlaneVerticalLineModel } from './HalfPlaneVerticalLineModel.js';
+import { LineModel } from '../LineModel.js';
 
 export class HalfPlaneSceneModel extends SceneModel {
 
@@ -20,24 +21,56 @@ export class HalfPlaneSceneModel extends SceneModel {
         }
 
         let line;
-        const EPS = 1e-10;
+        const EPS = 1e-8;
 
         const dx = pointModel2.x - pointModel1.x;
 
         // Vertical geodesic case
         if (Math.abs(dx) < EPS) {
             console.log("vertical")
-            line = HalfPlaneVerticalLineModel.create(pointModel1, pointModel2, color);
+            line = HalfPlaneVerticalLineModel.create(pointModel1, pointModel2, color, this);
         }
         // Circular geodesic case
 
         else {
-            console.log("normal")
-            line = HalfPlaneSemiCircleModel.create(pointModel1, pointModel2, color);
+            console.log("arc")
+            line = HalfPlaneSemiCircleModel.create(pointModel1, pointModel2, color, this);
         }
 
         super.addLine(line);
 
         return line;
     }
+
+        handleLineUpdate(lineModel) {
+            const isVertical = Math.abs(lineModel.pointModel1.x - lineModel.pointModel2.x) < 1e-6;
+    
+            // If type should change → replace
+            if (isVertical && lineModel.type !== "Line") {
+                const newModel = new HalfPlaneVerticalLineModel(
+                    lineModel.pointModel1,
+                    lineModel.pointModel2,
+                    lineModel.color,
+                    this
+                );
+    
+                this.replaceLine(lineModel, newModel);
+                return;
+            }
+    
+            if (!isVertical && lineModel.type !== "Circle") {
+                const newModel = new HalfPlaneSemiCircleModel( 
+                    lineModel.pointModel1,
+                    lineModel.pointModel2,
+                    lineModel.color,
+                    this
+                );
+    
+                this.replaceLine(lineModel, newModel);
+                return;
+            }
+    
+            // Otherwise just recompute geometry
+            lineModel.computeGeodesic?.();
+        }
 }

@@ -1,5 +1,9 @@
 import { PointModel } from './PointModel.js';
 import { LineModel } from './LineModel.js';
+import { HalfPlaneVerticalLineModel } from './halfPlane/HalfPlaneVerticalLineModel.js';
+import { HalfPlaneSemiCircleModel } from './halfPlane/HalfPlaneSemiCircleModel.js';
+import { DiscLineCircleModel } from './disc/DiscLineCircleModel.js';
+import { DiscLineDiameterModel } from './disc/DiscLineDiameterModel.js';
 
 export class SceneModel {
     constructor() {
@@ -14,6 +18,16 @@ export class SceneModel {
 
     notify() {
         this.listeners.forEach(listener => listener.update());
+    }
+
+    replaceLine(oldModel, newModel) {
+        const index = this.lineModels.indexOf(oldModel);
+
+        if (index !== -1) {
+            newModel.id = oldModel.id;
+            this.lineModels[index] = newModel;
+            this.notify();
+        }
     }
 
     addPoint(pointModel) {

@@ -16,7 +16,7 @@ export class DiscSceneModel extends SceneModel {
 
         let line;
         let isDiameter = false;
-        const EPS = 1e-10;
+        const EPS = 1e-2;
 
         const dx = pointModel2.x - pointModel1.x;
         const dy = pointModel2.y - pointModel1.y;
@@ -36,10 +36,10 @@ export class DiscSceneModel extends SceneModel {
         }
         if (isDiameter === true) {
             // Create diameter line
-            line = DiscLineDiameterModel.create(pointModel1, pointModel2, color);
+            line = DiscLineDiameterModel.create(pointModel1, pointModel2, color, this);
         } else {
             // Otherwise, create a circle arc line
-            line = DiscLineCircleModel.create(pointModel1, pointModel2, color);
+            line = DiscLineCircleModel.create(pointModel1, pointModel2, color, this);
         }
 
         // Use base class method to store it

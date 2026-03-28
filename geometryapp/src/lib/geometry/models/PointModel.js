@@ -12,8 +12,10 @@ export class PointModel {
         this.notify();
     }
 
-    addListener(fn) {
-        this.listeners.push(fn);
+    addListener(listener) {
+        if (!this.listeners.includes(listener)) {
+        this.listeners.push(listener);
+    }
     }
 
     notify() {

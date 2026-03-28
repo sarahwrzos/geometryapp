@@ -184,7 +184,6 @@ export class AppController {
     }
 
     createSceneView(type, model) {
-        console.log("here")
         let view;
         if (type === "disc") {
             view = DiscSceneView.create(model, this.svg, this.container.clientHeight, this.container.clientWidth, this);
@@ -208,6 +207,7 @@ export class AppController {
     }
 
     syncTo(sceneType) {
+        console.log(this.currentSceneView.lineViews)
         if (this.currentSceneType === sceneType) return;
 
         const current = this.scenes.get(this.currentSceneType);
@@ -262,6 +262,8 @@ export class AppController {
         // 7️⃣ Update current references
         this.currentSceneType = sceneType;
         this.currentSceneView = newView;
+
+        this.currentSceneView.update();
     }
 
     drawLine(lineModel, sceneView = this.currentSceneView) {

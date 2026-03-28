@@ -1,19 +1,26 @@
 import { PointModel } from '../PointModel.js';
-import { LineModel } from '../LineModel.js'
+import { LineModel } from '../LineModel.js';
+import { DiscLineDiameterModel } from './DiscLineDiameterModel.js';
+import { SceneModel } from '../SceneModel.js';
 
 export class DiscLineCircleModel extends LineModel {
-    static create(pointModel1, pointModel2, color) {
-        const line = new DiscLineCircleModel(pointModel1, pointModel2, color);
+    static create(pointModel1, pointModel2, color, sceneModel) {
+        const line = new DiscLineCircleModel(pointModel1, pointModel2, color, sceneModel);
         line.computeGeodesic();
         return line;
     }
 
-    constructor(pointModel1, pointModel2, color) {
-        super(pointModel1, pointModel2, color);
+    constructor(pointModel1, pointModel2, color, sceneModel) {
+        super(pointModel1, pointModel2, color, sceneModel);
         this.type = "Circle";
+        this.shouldBeCircle = true;
         this.center = new PointModel(0, 0);
         this.radius = null;
-        this.listeners = [];
+        //this.listeners = [];
+    }
+
+    getType(){
+        return this.type;
     }
 
     computeGeodesic() {
@@ -26,7 +33,23 @@ export class DiscLineCircleModel extends LineModel {
         const x2 = this.pointModel2.x;
         const y2 = this.pointModel2.y;
 
-        // Direction vector of the line
+        // 🔥 ADD THIS CHECK FIRST
+        const isVertical = Math.abs(x1 - x2) < 1e-2;
+
+        if (isVertical) {
+            const newModel = new HalfPlaneVerticalLineModel(
+                this.pointModel1,
+                this.pointModel2,
+                this.color,
+                this.sceneModel
+            );
+
+            //this.sceneModel.replaceLine(this, newModel);
+            return;
+        }
+
+        // ---- your ORIGINAL math (UNCHANGED) ----
+
         let dx = x2 - x1;
         let dy = y2 - y1;
 
@@ -36,7 +59,6 @@ export class DiscLineCircleModel extends LineModel {
             throw new Error("Points must be distinct");
         }
 
-        // Compute circle center and radius
         const d1 = x1*x1 + y1*y1;
         const d2 = x2*x2 + y2*y2;
         const denom = 2 * (x1*y2 - y1*x2); 

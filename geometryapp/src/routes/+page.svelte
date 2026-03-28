@@ -4,12 +4,30 @@ import { SVG } from "@svgdotjs/svg.js";
 import "@svgdotjs/svg.draggable.js";
 
 import { AppController } from "$lib/geometry/AppController.js";
+import { PointModel } from "$lib/geometry/models/PointModel.js";
 
 let container;
 let draw;
 let controller;
 
 let saveName = "default";
+
+function addVerticalLine() {
+  if (!controller) return;
+
+  // convert math → screen so we can reuse addPoint
+  const sceneView = controller.currentSceneView;
+
+  const p1Screen = sceneView.mathToScreen({ x: 0.5, y: 1 });
+  const p2Screen = sceneView.mathToScreen({ x: 0.5, y: 2 });
+
+  const p1 = controller.addPoint(p1Screen.x, p1Screen.y);
+  const p2 = controller.addPoint(p2Screen.x, p2Screen.y);
+
+  const line = sceneView.sceneModel.addLine(p1, p2, "red");
+
+  console.log("DEBUG LINE:", line, line.type);
+}
 
 function handleClick(event) {
 
@@ -62,6 +80,10 @@ Switch to Upper Half Plane Model
 
 <button on:click={() => controller.clear()}>
 Clear All
+</button>
+
+<button on:click={addVerticalLine}>
+Add Vertical Line (Debug)
 </button>
 
 </div>

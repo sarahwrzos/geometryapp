@@ -3,7 +3,7 @@ import { PointModel } from './PointModel.js';
 export class LineModel {
 
     // p1 and p2 are point model instances
-    constructor(pointModel1, pointModel2, color) {
+    constructor(pointModel1, pointModel2, color, sceneModel) {
         if (new.target === LineModel) {
             throw new Error("Cannot instantiate an abstract class directly");
         }
@@ -20,32 +20,20 @@ export class LineModel {
         this.pointModel1 = pointModel1;
         this.pointModel2 = pointModel2;
         this.color = color;
+        this.sceneModel = sceneModel;
+        this.id = crypto.randomUUID();
         
         this.listeners = [];
 
         this.pointModel1.addListener(() => {
-            this.computeGeodesic();
+            this.sceneModel.handleLineUpdate(this);
             this.notify();
         });
 
         this.pointModel2.addListener(() => {
-            this.computeGeodesic();
+            this.sceneModel.handleLineUpdate(this);
             this.notify();
         });
-    }
-
-    getType() {
-        const p1 = this.pointModel1;
-        const p2 = this.pointModel2;
-
-        const isVerticalLine = Math.abs(p1.x - p2.x) < 1e-6;
-
-        if (isVerticalLine) {
-            console.log("is line");
-            return "Line";
-        }
-
-        return "Circle";
     }
 
     computeGeodesic() {

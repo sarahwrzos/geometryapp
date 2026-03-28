@@ -1,23 +1,28 @@
 import { PointModel } from '../PointModel.js';
 import { LineModel } from '../LineModel.js';
+import { HalfPlaneVerticalLineModel } from './HalfPlaneVerticalLineModel.js';
+import { SceneModel } from '../SceneModel.js';
 
 export class HalfPlaneSemiCircleModel extends LineModel {
 
-    static create(pointModel1, pointModel2, color) {
-        const line = new HalfPlaneSemiCircleModel(pointModel1, pointModel2, color);
+    static create(pointModel1, pointModel2, color, sceneModel) {
+        const line = new HalfPlaneSemiCircleModel(pointModel1, pointModel2, color, sceneModel);
         line.computeGeodesic();
         return line;
     }
 
-    constructor(pointModel1, pointModel2, color) {
-        super(pointModel1, pointModel2, color);
+    constructor(pointModel1, pointModel2, color, sceneModel) {
+        super(pointModel1, pointModel2, color, sceneModel);
         this.type = "Circle";
+        this.shouldBeCircle = true;
         this.center = new PointModel(0, 0);
         this.radius = null;
-        this.listeners = [];
+        //this.listeners = [];
     }
 
-    
+    getType(){
+        return this.type;
+    }
 
     computeGeodesic() {
         if (!this.pointModel1 || !this.pointModel2) {
@@ -29,10 +34,22 @@ export class HalfPlaneSemiCircleModel extends LineModel {
         const x2 = this.pointModel2.x;
         const y2 = this.pointModel2.y;
 
-        // Vertical lines are handled by a different model
-        // if (x1 === x2) {
-        //     throw new Error("Points define a vertical geodesic, not a semicircle");
-        // }
+        // 🔥 ADD THIS CHECK (before your math)
+        const isVertical = Math.abs(x1 - x2) < 1e-2;
+
+        if (isVertical) {
+            const newModel = new HalfPlaneVerticalLineModel(
+                this.pointModel1,
+                this.pointModel2,
+                this.color,
+                this.sceneModel
+            );
+
+            this.sceneModel.replaceLine(this, newModel);
+            return;
+        }
+
+        // ---- your ORIGINAL math (unchanged) ----
 
         // Solve for center on x-axis (cy = 0)
         const cx = (x1*x1 + y1*y1 - x2*x2 - y2*y2) / (2 * (x1 - x2));

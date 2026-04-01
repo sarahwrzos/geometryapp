@@ -60,7 +60,7 @@ onMount(() => {
 
 <div style="position:absolute;top:10px;left:10px;z-index:1000">
 
-<input bind:value={saveName} placeholder="Save name" />
+<!-- <input bind:value={saveName} placeholder="Save name" /> -->
 
 <button on:click={() => controller.setTool("point")}>
 Draw Point
@@ -82,9 +82,9 @@ Switch Sides
 Clear All
 </button>
 
-<button on:click={addVerticalLine}>
+<!-- <button on:click={addVerticalLine}>
 Add Vertical Line (Debug)
-</button>
+</button> -->
 
 </div>
 

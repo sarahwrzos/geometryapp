@@ -21,6 +21,19 @@ export class AppController {
         this.secondarySceneView = null;
         this.rightSceneType = null;
         this.rightSceneModel = null;
+
+        this.handleOutsideLineActionClick = (e) => {
+            if (e.target.closest("button.line-action")) return;
+            this.removeLineActionButtons();
+        };
+
+        document.addEventListener("click", this.handleOutsideLineActionClick);
+    }
+
+    removeLineActionButtons() {
+        document
+            .querySelectorAll("button.line-action")
+            .forEach(b => b.remove());
     }
 
     init(sceneType) {
@@ -121,9 +134,7 @@ export class AppController {
 
             e.stopPropagation();
 
-            document
-                .querySelectorAll("button.line-action")
-                .forEach(b => b.remove());
+            this.removeLineActionButtons();
 
             const removeBtn = document.createElement("button");
 
@@ -137,10 +148,7 @@ export class AppController {
             removeBtn.onclick = () => {
 
                 sceneView.sceneModel.removeLine(lineView.model);
-
-                document
-                    .querySelectorAll("button.line-action")
-                    .forEach(b => b.remove());
+                this.removeLineActionButtons();
             };
 
             document.body.appendChild(removeBtn);
@@ -168,9 +176,7 @@ export class AppController {
                     });
                 }
 
-                document
-                    .querySelectorAll("button.line-action")
-                    .forEach(b => b.remove());
+                this.removeLineActionButtons();
             };
 
             document.body.appendChild(colorBtn);

@@ -55,6 +55,7 @@ export class HalfPlaneSceneModel extends SceneModel {
                 );
     
                 this.replaceLine(lineModel, newModel);
+                this.listeners.forEach(listener => listener.updateClip?.());
                 return;
             }
     
@@ -67,6 +68,7 @@ export class HalfPlaneSceneModel extends SceneModel {
                 );
     
                 this.replaceLine(lineModel, newModel);
+                this.listeners.forEach(listener => listener.updateClip?.());
                 return;
             }
     

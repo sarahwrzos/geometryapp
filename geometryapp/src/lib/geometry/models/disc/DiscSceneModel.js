@@ -77,6 +77,7 @@ export class DiscSceneModel extends SceneModel {
             );
             newModel.id = lineModel.id;
             this.replaceLine(lineModel, newModel);
+            this.listeners.forEach(listener => listener.updateClip?.());
             return;
         }
 
@@ -89,6 +90,7 @@ export class DiscSceneModel extends SceneModel {
             );
             newModel.id = lineModel.id;
             this.replaceLine(lineModel, newModel);
+            this.listeners.forEach(listener => listener.updateClip?.());
             return;
         }
 

@@ -43,36 +43,6 @@ export class HalfPlaneSceneModel extends SceneModel {
     }
 
         handleLineUpdate(lineModel) {
-            const isVertical = Math.abs(lineModel.pointModel1.x - lineModel.pointModel2.x) < 1e-6;
-    
-            // If type should change → replace
-            if (isVertical && lineModel.type !== "Line") {
-                const newModel = new HalfPlaneVerticalLineModel(
-                    lineModel.pointModel1,
-                    lineModel.pointModel2,
-                    lineModel.color,
-                    this
-                );
-    
-                this.replaceLine(lineModel, newModel);
-                this.listeners.forEach(listener => listener.updateClip?.());
-                return;
-            }
-    
-            if (!isVertical && lineModel.type !== "Circle") {
-                const newModel = new HalfPlaneSemiCircleModel( 
-                    lineModel.pointModel1,
-                    lineModel.pointModel2,
-                    lineModel.color,
-                    this
-                );
-    
-                this.replaceLine(lineModel, newModel);
-                this.listeners.forEach(listener => listener.updateClip?.());
-                return;
-            }
-    
-            // Otherwise just recompute geometry
             lineModel.computeGeodesic?.();
         }
 }

@@ -30,21 +30,21 @@ export class HalfPlaneVerticalLineModel extends LineModel {
         }
 
         // detect if it is still vertical
-        const isVertical = Math.abs(this.pointModel1.x - this.pointModel2.x) < 1e-2;
+        // const isVertical = Math.abs(this.pointModel1.x - this.pointModel2.x) < 1e-2;
 
-        if (!isVertical) {
-            // 👉 no longer a vertical line → replace with circle model
+        // if (!isVertical) {
+        //     // 👉 no longer a vertical line → replace with circle model
 
-            const newModel = new HalfPlaneSemiCircleModel(
-                this.pointModel1,
-                this.pointModel2,
-                this.color,
-                this.sceneModel
-            );
+        //     const newModel = new HalfPlaneSemiCircleModel(
+        //         this.pointModel1,
+        //         this.pointModel2,
+        //         this.color,
+        //         this.sceneModel
+        //     );
 
-            this.sceneModel.replaceLine(this, newModel);
-            return;
-        }
+        //     this.sceneModel.replaceLine(this, newModel);
+        //     return;
+        // }
 
         // still a vertical line → update normally
         this.x = this.pointModel1.x;

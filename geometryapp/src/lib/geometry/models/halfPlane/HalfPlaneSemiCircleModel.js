@@ -35,19 +35,19 @@ export class HalfPlaneSemiCircleModel extends LineModel {
         const y2 = this.pointModel2.y;
 
         // 🔥 ADD THIS CHECK (before your math)
-        const isVertical = Math.abs(x1 - x2) < 1e-2;
+        // const isVertical = Math.abs(x1 - x2) < 1e-2;
 
-        if (isVertical) {
-            const newModel = new HalfPlaneVerticalLineModel(
-                this.pointModel1,
-                this.pointModel2,
-                this.color,
-                this.sceneModel
-            );
+        // if (isVertical) {
+        //     const newModel = new HalfPlaneVerticalLineModel(
+        //         this.pointModel1,
+        //         this.pointModel2,
+        //         this.color,
+        //         this.sceneModel
+        //     );
 
-            this.sceneModel.replaceLine(this, newModel);
-            return;
-        }
+        //     this.sceneModel.replaceLine(this, newModel);
+        //     return;
+        // }
 
         // ---- your ORIGINAL math (unchanged) ----
 

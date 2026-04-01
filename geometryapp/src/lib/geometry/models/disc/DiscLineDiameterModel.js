@@ -6,6 +6,9 @@ import { SceneModel } from '../SceneModel.js';
 export class DiscLineDiameterModel extends LineModel {
 
     static create(pointModel1, pointModel2, color, sceneModel) {
+        if (pointModel1 === pointModel2) {
+            throw new Error("Points must be distinct")
+        }
         const line = new DiscLineDiameterModel(pointModel1, pointModel2, color, sceneModel);
         line.computeGeodesic();
         return line;
@@ -38,21 +41,20 @@ export class DiscLineDiameterModel extends LineModel {
         const y2 = this.pointModel2.y;
 
         // 🔥 ADD THIS CHECK
-        const isVertical = Math.abs(x1 - x2) < 1e-2;
+        // const isVertical = Math.abs(x1 - x2) < 1e-2;
 
-        if (isVertical) {
-            const newModel = new HalfPlaneVerticalLineModel(
-                this.pointModel1,
-                this.pointModel2,
-                this.color,
-                this.sceneModel
-            );
+        // if (isVertical) {
+        //     const newModel = new HalfPlaneVerticalLineModel(
+        //         this.pointModel1,
+        //         this.pointModel2,
+        //         this.color,
+        //         this.sceneModel
+        //     );
 
-            //this.sceneModel.replaceLine(this, newModel);
-            return;
-        }
+        //     //this.sceneModel.replaceLine(this, newModel);
+        //     return;
+        // }
 
-        // ---- your ORIGINAL math (UNCHANGED) ----
 
         let dx = x2 - x1;
         let dy = y2 - y1;

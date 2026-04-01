@@ -315,10 +315,8 @@ export class AppController {
 
         const newModel = this.transformModel(current.model, this.currentSceneType, sceneType);
 
-        // 4️⃣ Rebuild only the right-side scene from transformed data
         this.createRightSceneView(sceneType, newModel);
 
-        // 5️⃣ Store new scene
         this.scenes.set(sceneType, {
             view: this.secondarySceneView,
             model: newModel

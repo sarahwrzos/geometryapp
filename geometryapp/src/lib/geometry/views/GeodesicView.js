@@ -17,7 +17,7 @@ export class GeodesicView {
     constructor(model, sceneView, color = "black", width = 2) {
 
         this.model = model;
-        this.color = color;
+        this.color = this.model?.color ?? color;
         this.width = width;
         this.sceneView = sceneView; // for math->pixel conversion
         this.element = null;
@@ -35,6 +35,8 @@ export class GeodesicView {
     update() {
         if (!this.element) return;
 
+        this.color = this.model?.color ?? this.color;
+
         // Default behavior: redraw
         this.draw();
     }
@@ -42,14 +44,12 @@ export class GeodesicView {
     enableHover(highlightColor = "red") {
         if (!this.element) return;
 
-        const baseColor = this.color ?? "black";
-
         this.element.on("mouseover", () => {
             this.element.stroke({ color: highlightColor });
         });
 
         this.element.on("mouseout", () => {
-            this.element.stroke({ color: baseColor });
+            this.element.stroke({ color: this.model?.color ?? this.color ?? "black" });
         });
     }
 

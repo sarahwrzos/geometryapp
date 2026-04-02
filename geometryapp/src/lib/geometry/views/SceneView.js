@@ -84,6 +84,18 @@ export class SceneView {
     update() {
         if (!this.isActive) return;
 
+        const pointModels = new Set(this.sceneModel.pointModels);
+        this.pointViews = this.pointViews.filter(view => {
+            const keep = pointModels.has(view.model);
+            if (!keep) {
+                view.element?.remove();
+                view.element = null;
+            } else {
+                view.update?.();
+            }
+            return keep;
+        });
+
         const modelToView = new Map();
 
         // build lookup from existing views

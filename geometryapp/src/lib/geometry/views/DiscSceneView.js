@@ -5,6 +5,9 @@ export class DiscSceneView extends SceneView {
         super(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex, sceneCount);
         this.unitCircleClip = null;
         this.circleElement = null; // the actual SVG circle for display
+        this.showAxes = false;
+        this.xAxisElement = null;
+        this.yAxisElement = null;
     }
 
     // Factory method
@@ -30,8 +33,48 @@ export class DiscSceneView extends SceneView {
             .fill("none")
             .stroke({ color: "black", width: 2 });
 
+        this.updateAxes();
+
         // Create clip for all elements
         this.updateClip();
+    }
+
+    setAxesVisible(visible) {
+        this.showAxes = Boolean(visible);
+        this.updateAxes();
+        this.applyClipToElements();
+    }
+
+    updateAxes() {
+        this.removeAxes();
+
+        if (!this.showAxes || !this.svg) return;
+
+        const { xmin, sceneWidth } = this.getSceneXBounds();
+        const cx = xmin + sceneWidth / 2;
+        const cy = this.containerHeight / 2;
+
+        this.xAxisElement = this.svg
+            .line(xmin, cy, xmin + sceneWidth, cy)
+            .stroke({ color: "blue", width: 1 })
+            .attr({ "pointer-events": "none" });
+
+        this.yAxisElement = this.svg
+            .line(cx, 0, cx, this.containerHeight)
+            .stroke({ color: "blue", width: 1 })
+            .attr({ "pointer-events": "none" });
+    }
+
+    removeAxes() {
+        if (this.xAxisElement) {
+            this.xAxisElement.remove();
+            this.xAxisElement = null;
+        }
+
+        if (this.yAxisElement) {
+            this.yAxisElement.remove();
+            this.yAxisElement = null;
+        }
     }
 
     removeScene() {
@@ -48,6 +91,8 @@ export class DiscSceneView extends SceneView {
             this.unitCircleClip.remove();
             this.unitCircleClip = null;
         }
+
+        this.removeAxes();
 
         // Remove all line and point elements
         this.lineViews.forEach(view => {
@@ -80,6 +125,9 @@ export class DiscSceneView extends SceneView {
 
     applyClipToElements() {
         if (!this.unitCircleClip) return;
+
+        if (this.xAxisElement) this.xAxisElement.clipWith(this.unitCircleClip);
+        if (this.yAxisElement) this.yAxisElement.clipWith(this.unitCircleClip);
 
         this.pointViews.forEach(v => {
             if (v.element) v.element.clipWith(this.unitCircleClip);

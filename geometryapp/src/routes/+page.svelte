@@ -9,6 +9,7 @@ import { PointModel } from "$lib/geometry/models/PointModel.js";
 let container;
 let draw;
 let controller;
+let axesVisible = false;
 
 let saveName = "default";
 
@@ -40,6 +41,12 @@ function handleClick(event) {
     pt.matrixTransform(draw.node.getScreenCTM().inverse());
 
   controller.handleClick(coords.x, coords.y);
+}
+
+function toggleAxes() {
+  if (!controller) return;
+  axesVisible = !axesVisible;
+  controller.setDiscAxesVisible(axesVisible);
 }
 
 onMount(() => {
@@ -80,6 +87,10 @@ Switch Sides
 
 <button on:click={() => controller.clear()}>
 Clear All
+</button>
+
+<button on:click={toggleAxes}>
+{axesVisible ? "Hide Axes" : "Show Axes"}
 </button>
 
 <!-- <button on:click={addVerticalLine}>

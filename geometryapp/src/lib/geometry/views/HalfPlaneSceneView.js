@@ -5,6 +5,8 @@ export class HalfPlaneSceneView extends SceneView {
         super(sceneModel, svg, containerHeight, containerWidth, controller, sceneIndex, sceneCount);
         this.baseLineElement = null;   // horizontal line at 2/3 height
         this.clipRect = null;          // SVG rectangle clip for top 2/3
+        this.showAxes = false;
+        this.yAxisElement = null;
     }
 
     // Factory method
@@ -28,8 +30,38 @@ export class HalfPlaneSceneView extends SceneView {
         this.baseLineElement = this.svg.line(xmin, y, xmax, y)
             .stroke({ color: "black", width: 2 });
 
+        this.updateAxes();
+
         // Create clip rectangle for top 2/3
         this.updateClip();
+    }
+
+    setAxesVisible(visible) {
+        this.showAxes = Boolean(visible);
+        this.updateAxes();
+        this.applyClipToElements();
+    }
+
+    updateAxes() {
+        this.removeAxes();
+
+        if (!this.showAxes || !this.svg) return;
+
+        const yBottom = (2 / 3) * this.containerHeight;
+        const { xmin, sceneWidth } = this.getSceneXBounds();
+        const xCenter = xmin + sceneWidth / 2;
+
+        this.yAxisElement = this.svg
+            .line(xCenter, 0, xCenter, yBottom)
+            .stroke({ color: "blue", width: 1 })
+            .attr({ "pointer-events": "none" });
+    }
+
+    removeAxes() {
+        if (this.yAxisElement) {
+            this.yAxisElement.remove();
+            this.yAxisElement = null;
+        }
     }
 
     updateClip() {
@@ -48,6 +80,8 @@ export class HalfPlaneSceneView extends SceneView {
 
     applyClipToElements() {
         if (!this.clipRect) return;
+
+        if (this.yAxisElement) this.yAxisElement.clipWith(this.clipRect);
 
         this.pointViews.forEach(v => {
             if (v.element) v.element.clipWith(this.clipRect);
@@ -70,6 +104,8 @@ export class HalfPlaneSceneView extends SceneView {
             this.clipRect.remove();
             this.clipRect = null;
         }
+
+        this.removeAxes();
 
         this.lineViews.forEach(view => {
             if (view.element) view.element.remove();

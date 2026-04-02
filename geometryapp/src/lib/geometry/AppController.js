@@ -21,6 +21,7 @@ export class AppController {
         this.secondarySceneView = null;
         this.rightSceneType = null;
         this.rightSceneModel = null;
+        this.showDiscAxes = false;
 
         this.handleOutsideLineActionClick = (e) => {
             if (e.target.closest("button.line-action")) return;
@@ -198,6 +199,27 @@ export class AppController {
         //this.currentSceneView.removeScene();
     }
 
+    setDiscAxesVisible(visible) {
+        this.showDiscAxes = Boolean(visible);
+        this.applyDiscAxesVisibility();
+    }
+
+    toggleDiscAxes() {
+        this.showDiscAxes = !this.showDiscAxes;
+        this.applyDiscAxesVisibility();
+        return this.showDiscAxes;
+    }
+
+    applyDiscAxesVisibility() {
+        if (this.currentSceneView?.setAxesVisible) {
+            this.currentSceneView.setAxesVisible(this.showDiscAxes);
+        }
+
+        if (this.secondarySceneView?.setAxesVisible) {
+            this.secondarySceneView.setAxesVisible(this.showDiscAxes);
+        }
+    }
+
     createSceneView(type, model) {
         let view;
 
@@ -230,6 +252,7 @@ export class AppController {
         //model.lineModels.forEach(line => this.drawLine(line, view));
 
         view.updateClip();
+        this.applyDiscAxesVisibility();
         return view;
     }
 
@@ -307,6 +330,7 @@ export class AppController {
 
         this.secondarySceneView.update();
         this.secondarySceneView.updateClip();
+        this.applyDiscAxesVisibility();
 
         this.rightSceneType = type;
         this.rightSceneModel = model;
@@ -392,6 +416,8 @@ export class AppController {
             view: this.secondarySceneView,
             model: newRightModel
         });
+
+        this.applyDiscAxesVisibility();
     }
 
     drawLine(lineModel, sceneView = this.currentSceneView) {

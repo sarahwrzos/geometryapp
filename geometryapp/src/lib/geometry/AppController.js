@@ -105,6 +105,26 @@ export class AppController {
 
             this.tempPoint = null;
             this.activeTool = null;
+            return;
+        }
+
+        // CIRCLE TOOL (first click: center, second click: point on circle)
+        if (this.activeTool === "circle") {
+
+            const newPoint = this.addPoint(x, y);
+
+            // FIRST CLICK: center
+            if (this.tempPoint === null) {
+                this.tempPoint = newPoint;
+                return;
+            }
+
+            // SECOND CLICK: radius point
+            this.currentSceneView.sceneModel.addCircle(this.tempPoint, newPoint);
+            this.currentSceneView.updateClip();
+
+            this.tempPoint = null;
+            this.activeTool = null;
         }
     }
 
@@ -287,6 +307,15 @@ export class AppController {
             const p1 = pointMap.get(line.pointModel1);
             const p2 = pointMap.get(line.pointModel2);
             targetModel.addLine(p1, p2, line.color);
+        });
+
+        sourceModel.circleModels?.forEach(circle => {
+            const center = pointMap.get(circle.center);
+            const point = pointMap.get(circle.pointModel);
+
+            if (center && point) {
+                targetModel.addCircle(center, point, circle.color);
+            }
         });
 
         return targetModel;

@@ -8,6 +8,7 @@ import { DiscLineDiameterModel } from './disc/DiscLineDiameterModel.js';
 export class SceneModel {
     constructor() {
         this.lineModels = [];
+        this.circleModels = [];
         this.pointModels = [];
         this.listeners = [];
     }
@@ -58,6 +59,25 @@ export class SceneModel {
         }
     }
 
+    addCircle(centerPointModel, pointModel, color = "black") {
+        const circle = CircleModel.create(centerPointModel, pointModel, color);
+
+        if (!this.circleModels.includes(circle)) {
+            this.circleModels.push(circle);
+            this.notify();
+        }
+
+        return circle;
+    }
+
+    removeCircle(circleModel) {
+        const index = this.circleModels.indexOf(circleModel);
+        if (index !== -1) {
+            this.circleModels.splice(index, 1);
+            this.notify();
+        }
+    }
+
     removeLine(lineModel) {
         const index = this.lineModels.indexOf(lineModel);
         if (index !== -1) {
@@ -75,6 +95,11 @@ export class SceneModel {
         const index = this.pointModels.indexOf(pointModel);
         if (index !== -1) {
             this.pointModels.splice(index, 1);
+
+            this.circleModels = this.circleModels.filter(circle =>
+                circle.center !== pointModel && circle.pointModel !== pointModel
+            );
+
             this.notify();
         }
     }
@@ -82,6 +107,7 @@ export class SceneModel {
     clearAll() {
         this.pointModels = [];
         this.lineModels = [];
+        this.circleModels = [];
         this.notify();
     }
 

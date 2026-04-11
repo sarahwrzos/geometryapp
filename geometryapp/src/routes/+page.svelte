@@ -77,6 +77,10 @@ Draw Point
 Draw Hyperbolic Line
 </button>
 
+<button on:click={() => controller.setTool("circle")}>
+Draw Circle
+</button>
+
 <button on:click={() => controller.syncTo()}>
 Sync
 </button>

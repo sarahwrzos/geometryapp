@@ -90,6 +90,10 @@ export class HalfPlaneSceneView extends SceneView {
         this.lineViews.forEach(v => {
             if (v.element) v.element.clipWith(this.clipRect);
         });
+
+        this.circleViews.forEach(v => {
+            if (v.element) v.element.clipWith(this.clipRect);
+        });
     }
 
     removeScene() {
@@ -112,6 +116,12 @@ export class HalfPlaneSceneView extends SceneView {
             view.element = null;
         });
         this.lineViews = [];
+
+        this.circleViews.forEach(view => {
+            if (view.element) view.element.remove();
+            view.element = null;
+        });
+        this.circleViews = [];
 
         this.pointViews.forEach(view => {
             if (view.element) view.element.remove();

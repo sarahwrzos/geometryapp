@@ -10,6 +10,7 @@ export class SceneView {
         this.svg = svg;
         this.pointViews = [];
         this.lineViews = [];
+        this.circleViews = [];
         this.isActive = true;
         this.sceneIndex = sceneIndex;
         this.sceneCount = sceneCount;
@@ -72,13 +73,16 @@ export class SceneView {
         if (!this.isActive) return;
         this.pointViews.forEach(p => p.draw());
         this.lineViews.forEach(l => l.draw());
+        this.circleViews.forEach(c => c.draw());
     }
 
     clearAll() {
         this.pointViews.forEach(p => p.element?.remove());
         this.lineViews.forEach(l => l.element?.remove());
+        this.circleViews.forEach(c => c.element?.remove());
         this.pointViews = [];
         this.lineViews = [];
+        this.circleViews = [];
     }
 
     update() {
@@ -143,6 +147,33 @@ export class SceneView {
         }
 
         this.lineViews = newViews;
+
+        const circleModelToView = new Map();
+        for (const view of this.circleViews) {
+            circleModelToView.set(view.model.id, view);
+        }
+
+        const newCircleViews = [];
+        for (const model of this.sceneModel.circleModels ?? []) {
+            let existing = circleModelToView.get(model.id);
+
+            if (!existing) {
+                existing = new CircleView(model, this);
+                existing.draw();
+            } else {
+                existing.update();
+            }
+
+            newCircleViews.push(existing);
+        }
+
+        for (const oldView of this.circleViews) {
+            if (!newCircleViews.includes(oldView)) {
+                oldView.element?.remove();
+            }
+        }
+
+        this.circleViews = newCircleViews;
     }
 
 

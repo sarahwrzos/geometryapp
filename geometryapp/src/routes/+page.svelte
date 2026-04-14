@@ -226,11 +226,6 @@
     font-size: 1rem;
   }
 
-  .close-btn {
-    padding: 0.45rem 0.8rem;
-    font-size: 0.85rem;
-  }
-
   .help-panel ul {
     margin: 0;
     padding-left: 1.1rem;

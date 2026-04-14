@@ -102,9 +102,15 @@
     </div>
   {/if}
 
+
   <main class="scene-shell">
     <div bind:this={container} class="scene-container"></div>
   </main>
+
+  <footer class="app-footer">
+    <p>© 2026 Sarah Wrzos</p>
+    <p>Built for educational purposes.</p>
+  </footer>
 </div>
 
 <style>
@@ -192,6 +198,7 @@
     color: white;
     border-color: transparent;
   }
+  
 
   .help-btn {
     width: 42px;
@@ -270,5 +277,19 @@
       height: calc(100vh - 180px);
       min-height: 480px;
     }
+  }
+
+  .app-footer {
+    padding: 1.5rem 1.25rem;
+    background: rgba(248, 250, 252, 0.6);
+    border-top: 1px solid rgba(148, 163, 184, 0.18);
+    text-align: center;
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .app-footer p {
+    margin: 0.25rem 0;
   }
 </style>

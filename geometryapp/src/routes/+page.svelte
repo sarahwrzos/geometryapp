@@ -82,9 +82,9 @@ Switch Sides
 Clear All
 </button>
 
-<!-- <button on:click={addVerticalLine}>
+<button on:click={addVerticalLine}>
 Add Vertical Line (Debug)
-</button> -->
+</button>
 
 </div>
 

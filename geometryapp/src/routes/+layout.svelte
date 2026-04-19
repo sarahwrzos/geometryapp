@@ -6,6 +6,9 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>Hyperbolic Geometry</title>
 </svelte:head>
+
+
 
 {@render children()}

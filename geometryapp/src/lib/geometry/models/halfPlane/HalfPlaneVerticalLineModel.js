@@ -5,6 +5,8 @@ import { SceneModel } from '../SceneModel.js';
 
 export class HalfPlaneVerticalLineModel extends LineModel {
 
+    static EPS = 1e-6;
+
     static create(pointModel1, pointModel2, color, sceneModel) {
         const line = new HalfPlaneVerticalLineModel(pointModel1, pointModel2, color, sceneModel);
         line.computeGeodesic();
@@ -15,7 +17,9 @@ export class HalfPlaneVerticalLineModel extends LineModel {
         super(pointModel1, pointModel2, color, sceneModel);
         this.type = "Line";
         this.shouldBeCircle = false;
-        this.x = null; // x-coordinate of vertical line
+        this.x = null; // representative x value (uses both points)
+        this.x1 = null; // exact x from pointModel1
+        this.x2 = null; // exact x from pointModel2
 
         //this.listeners = [];
     }
@@ -30,12 +34,12 @@ export class HalfPlaneVerticalLineModel extends LineModel {
         }
 
         // detect if it is still vertical
-        const isVertical = Math.abs(this.pointModel1.x - this.pointModel2.x) < 1e-2;
+        const isVertical = Math.abs(this.pointModel1.x - this.pointModel2.x) < HalfPlaneVerticalLineModel.EPS;
 
         if (!isVertical) {
             // 👉 no longer a vertical line → replace with circle model
 
-            const newModel = new HalfPlaneSemiCircleModel(
+            const newModel = HalfPlaneSemiCircleModel.create(
                 this.pointModel1,
                 this.pointModel2,
                 this.color,
@@ -46,8 +50,10 @@ export class HalfPlaneVerticalLineModel extends LineModel {
             return;
         }
 
-        // still a vertical line → update normally
-        this.x = this.pointModel1.x;
+        // still a vertical line: preserve exact point coordinates without snapping
+        this.x1 = this.pointModel1.x;
+        this.x2 = this.pointModel2.x;
+        this.x = (this.x1 + this.x2) / 2;
     }
 
     addListener(fn) {

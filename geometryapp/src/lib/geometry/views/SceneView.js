@@ -74,6 +74,10 @@ export class SceneView {
         this.lineViews.forEach(l => l.draw());
     }
 
+    getViewTypeName(view) {
+        return view?.constructor?.name ?? "UnknownView";
+    }
+
     clearAll() {
         this.pointViews.forEach(p => p.element?.remove());
         this.lineViews.forEach(l => l.element?.remove());
@@ -83,6 +87,10 @@ export class SceneView {
 
     update() {
         if (!this.isActive) return;
+
+        console.log(
+            `[SceneView:update] lines=${this.sceneModel.lineModels.length}, view=${this.constructor.name}`
+        );
 
         const modelToView = new Map();
 
@@ -100,8 +108,14 @@ export class SceneView {
             const shouldBeCircle = model.type === "Circle";
             const isCircleView = existing instanceof CircleView;
 
+            console.log(
+                `[SceneView:update] line id=${model.id}, modelType=${model.type}, existingView=${this.getViewTypeName(existing)}, targetView=${shouldBeCircle ? "CircleView" : "LineView"}`
+            );
+
             if (existing && (shouldBeCircle !== isCircleView)) {
-                //console.log("SWITCHING VIEW TYPE");
+                console.log(
+                    `[SceneView:update] switching view type for line id=${model.id} from ${this.getViewTypeName(existing)} to ${shouldBeCircle ? "CircleView" : "LineView"}`
+                );
 
                 existing.element?.remove();
                 existing = null;

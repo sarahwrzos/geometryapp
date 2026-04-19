@@ -6,6 +6,8 @@ import { LineModel } from '../LineModel.js';
 
 export class HalfPlaneSceneModel extends SceneModel {
 
+    static EPS = 1e-6;
+
     constructor() {
         super();
     }
@@ -21,7 +23,7 @@ export class HalfPlaneSceneModel extends SceneModel {
         }
 
         let line;
-        const EPS = 1e-8;
+        const EPS = HalfPlaneSceneModel.EPS;
 
         const dx = pointModel2.x - pointModel1.x;
 
@@ -43,11 +45,50 @@ export class HalfPlaneSceneModel extends SceneModel {
     }
 
         handleLineUpdate(lineModel) {
-            const isVertical = Math.abs(lineModel.pointModel1.x - lineModel.pointModel2.x) < 1e-6;
+            const isVertical = Math.abs(lineModel.pointModel1.x - lineModel.pointModel2.x) < HalfPlaneSceneModel.EPS;
+
+            if (this.isLineDragActive) {
+                console.log(
+                    `[HalfPlaneSceneModel:update] dragging=true, lines=${this.lineModels.length}, lineId=${lineModel.id}, currentType=${lineModel.type}, vertical=${isVertical}`
+                );
+
+                if (lineModel.type === "Line" && !isVertical) {
+                    const newModel = HalfPlaneSemiCircleModel.create(
+                        lineModel.pointModel1,
+                        lineModel.pointModel2,
+                        lineModel.color,
+                        this
+                    );
+
+                    this.replaceLine(lineModel, newModel);
+                    this.listeners.forEach(listener => listener.updateClip?.());
+                    return;
+                }
+
+                if (lineModel.type === "Line") {
+                    lineModel.x1 = lineModel.pointModel1.x;
+                    lineModel.x2 = lineModel.pointModel2.x;
+                    lineModel.x = (lineModel.x1 + lineModel.x2) / 2;
+                    return;
+                }
+
+                if (!isVertical) {
+                    lineModel.computeGeodesic?.();
+                }
+
+                return;
+            }
+
+            console.log(
+                `[HalfPlaneSceneModel:update] lines=${this.lineModels.length}, lineId=${lineModel.id}, currentType=${lineModel.type}, vertical=${isVertical}`
+            );
     
             // If type should change → replace
             if (isVertical && lineModel.type !== "Line") {
-                const newModel = new HalfPlaneVerticalLineModel(
+                console.log(
+                    `[HalfPlaneSceneModel:update] switching lineId=${lineModel.id} to Line` 
+                );
+                const newModel = HalfPlaneVerticalLineModel.create(
                     lineModel.pointModel1,
                     lineModel.pointModel2,
                     lineModel.color,
@@ -60,7 +101,10 @@ export class HalfPlaneSceneModel extends SceneModel {
             }
     
             if (!isVertical && lineModel.type !== "Circle") {
-                const newModel = new HalfPlaneSemiCircleModel( 
+                console.log(
+                    `[HalfPlaneSceneModel:update] switching lineId=${lineModel.id} to Circle`
+                );
+                const newModel = HalfPlaneSemiCircleModel.create(
                     lineModel.pointModel1,
                     lineModel.pointModel2,
                     lineModel.color,

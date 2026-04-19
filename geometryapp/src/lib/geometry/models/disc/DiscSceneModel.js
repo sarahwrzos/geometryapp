@@ -68,7 +68,43 @@ export class DiscSceneModel extends SceneModel {
             }
         }
 
+        if (this.isLineDragActive) {
+            console.log(
+                `[DiscSceneModel:update] dragging=true, lines=${this.lineModels.length}, lineId=${lineModel.id}, currentType=${lineModel.type}, diameter=${isDiameter}`
+            );
+
+            if (lineModel.type === "Circle" && isDiameter) {
+                return;
+            }
+
+            if (lineModel.type === "Line" && !isDiameter) {
+                const newModel = DiscLineCircleModel.create(
+                    lineModel.pointModel1,
+                    lineModel.pointModel2,
+                    lineModel.color,
+                    this
+                );
+                newModel.id = lineModel.id;
+                this.replaceLine(lineModel, newModel);
+                this.listeners.forEach(listener => listener.updateClip?.());
+                return;
+            }
+
+            if (lineModel.type === "Line" || !isDiameter) {
+                lineModel.computeGeodesic?.();
+            }
+
+            return;
+        }
+
+        console.log(
+            `[DiscSceneModel:update] lines=${this.lineModels.length}, lineId=${lineModel.id}, currentType=${lineModel.type}, diameter=${isDiameter}`
+        );
+
         if (isDiameter && lineModel.type !== "Line") {
+            console.log(
+                `[DiscSceneModel:update] switching lineId=${lineModel.id} to Line`
+            );
             const newModel = DiscLineDiameterModel.create(
                 lineModel.pointModel1,
                 lineModel.pointModel2,
@@ -82,6 +118,9 @@ export class DiscSceneModel extends SceneModel {
         }
 
         if (!isDiameter && lineModel.type !== "Circle") {
+            console.log(
+                `[DiscSceneModel:update] switching lineId=${lineModel.id} to Circle`
+            );
             const newModel = DiscLineCircleModel.create(
                 lineModel.pointModel1,
                 lineModel.pointModel2,

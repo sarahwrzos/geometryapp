@@ -46,6 +46,10 @@ export class PointView {
 
         this.element.draggable();
 
+        this.element.on('dragstart', () => {
+            this.sceneView.sceneModel.beginLineDrag?.();
+        });
+
         this.element.on('dragmove', (event) => {
             let newX = event.detail.box.cx;
             let newY = event.detail.box.cy;
@@ -63,6 +67,10 @@ export class PointView {
             );
 
             this.model.setXY(mathX, mathY);
+        });
+
+        this.element.on('dragend', () => {
+            this.sceneView.sceneModel.endLineDrag?.();
         });
     }
 

@@ -423,10 +423,8 @@ export class AppController {
     drawLine(lineModel, sceneView = this.currentSceneView) {
         let lineView;
         if (lineModel.getType() === "Line") {
-            console.log("in not else")
             lineView = LineView.create(LineView, lineModel, sceneView);
         } else {
-            console.log("in else")
             lineView = CircleView.create(CircleView, lineModel, sceneView);
         }
         sceneView.lineViews.push(lineView);

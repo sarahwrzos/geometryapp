@@ -10,6 +10,7 @@ export class SceneModel {
         this.lineModels = [];
         this.pointModels = [];
         this.listeners = [];
+        this.isLineDragActive = false;
     }
 
     addListener(listener) {
@@ -18,6 +19,21 @@ export class SceneModel {
 
     notify() {
         this.listeners.forEach(listener => listener.update());
+    }
+
+    beginLineDrag() {
+        this.isLineDragActive = true;
+    }
+
+    endLineDrag() {
+        this.isLineDragActive = false;
+        this.reconcileLineTypes();
+    }
+
+    reconcileLineTypes() {
+        for (const lineModel of [...this.lineModels]) {
+            this.handleLineUpdate(lineModel);
+        }
     }
 
     replaceLine(oldModel, newModel) {

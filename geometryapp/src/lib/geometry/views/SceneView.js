@@ -113,8 +113,6 @@ export class SceneView {
             const isCircleView = existing instanceof CircleView;
 
             if (existing && (shouldBeCircle !== isCircleView)) {
-                //console.log("SWITCHING VIEW TYPE");
-
                 existing.element?.remove();
                 existing = null;
             }

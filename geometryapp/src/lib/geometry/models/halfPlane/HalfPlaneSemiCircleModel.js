@@ -5,6 +5,8 @@ import { SceneModel } from '../SceneModel.js';
 
 export class HalfPlaneSemiCircleModel extends LineModel {
 
+    static EPS = 1e-6;
+
     static create(pointModel1, pointModel2, color, sceneModel) {
         const line = new HalfPlaneSemiCircleModel(pointModel1, pointModel2, color, sceneModel);
         line.computeGeodesic();
@@ -35,19 +37,19 @@ export class HalfPlaneSemiCircleModel extends LineModel {
         const y2 = this.pointModel2.y;
 
         // 🔥 ADD THIS CHECK (before your math)
-        // const isVertical = Math.abs(x1 - x2) < 1e-2;
+        const isVertical = Math.abs(x1 - x2) < HalfPlaneSemiCircleModel.EPS;
 
-        // if (isVertical) {
-        //     const newModel = new HalfPlaneVerticalLineModel(
-        //         this.pointModel1,
-        //         this.pointModel2,
-        //         this.color,
-        //         this.sceneModel
-        //     );
+        if (isVertical) {
+            const newModel = HalfPlaneVerticalLineModel.create(
+                this.pointModel1,
+                this.pointModel2,
+                this.color,
+                this.sceneModel
+            );
 
-        //     this.sceneModel.replaceLine(this, newModel);
-        //     return;
-        // }
+            this.sceneModel.replaceLine(this, newModel);
+            return;
+        }
 
         // ---- your ORIGINAL math (unchanged) ----
 

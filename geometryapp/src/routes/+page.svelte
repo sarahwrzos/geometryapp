@@ -25,8 +25,6 @@ function addVerticalLine() {
   const p2 = controller.addPoint(p2Screen.x, p2Screen.y);
 
   const line = sceneView.sceneModel.addLine(p1, p2, "red");
-
-  console.log("DEBUG LINE:", line, line.type);
 }
 
 function handleClick(event) {

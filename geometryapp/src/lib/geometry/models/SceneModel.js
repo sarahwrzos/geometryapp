@@ -64,7 +64,6 @@ export class SceneModel {
     }
 
     addLine(lineModel) {
-        console.log("drawing line model:", lineModel)
         if (!(lineModel instanceof LineModel)) {
             throw new TypeError("Only LineModel instances can be added");
         }

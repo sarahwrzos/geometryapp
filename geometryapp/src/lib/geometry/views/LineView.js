@@ -37,7 +37,6 @@ export class LineView extends GeodesicView {
         } else {
             this.element.plot(a.x, a.y, b.x, b.y);
         }
-        //console.log(this.sceneView.lineViews)
         //this.element.front();
         return this.element;
         

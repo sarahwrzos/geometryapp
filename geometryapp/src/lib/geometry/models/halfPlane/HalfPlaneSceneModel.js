@@ -29,13 +29,11 @@ export class HalfPlaneSceneModel extends SceneModel {
 
         // Vertical geodesic case
         if (Math.abs(dx) < EPS) {
-            console.log("vertical")
             line = HalfPlaneVerticalLineModel.create(pointModel1, pointModel2, color, this);
         }
         // Circular geodesic case
 
         else {
-            console.log("arc")
             line = HalfPlaneSemiCircleModel.create(pointModel1, pointModel2, color, this);
         }
 
@@ -48,10 +46,6 @@ export class HalfPlaneSceneModel extends SceneModel {
             const isVertical = Math.abs(lineModel.pointModel1.x - lineModel.pointModel2.x) < HalfPlaneSceneModel.EPS;
 
             if (this.isLineDragActive) {
-                console.log(
-                    `[HalfPlaneSceneModel:update] dragging=true, lines=${this.lineModels.length}, lineId=${lineModel.id}, currentType=${lineModel.type}, vertical=${isVertical}`
-                );
-
                 if (lineModel.type === "Line" && !isVertical) {
                     const newModel = HalfPlaneSemiCircleModel.create(
                         lineModel.pointModel1,
@@ -78,16 +72,9 @@ export class HalfPlaneSceneModel extends SceneModel {
 
                 return;
             }
-
-            console.log(
-                `[HalfPlaneSceneModel:update] lines=${this.lineModels.length}, lineId=${lineModel.id}, currentType=${lineModel.type}, vertical=${isVertical}`
-            );
     
             // If type should change → replace
             if (isVertical && lineModel.type !== "Line") {
-                console.log(
-                    `[HalfPlaneSceneModel:update] switching lineId=${lineModel.id} to Line` 
-                );
                 const newModel = HalfPlaneVerticalLineModel.create(
                     lineModel.pointModel1,
                     lineModel.pointModel2,
@@ -101,9 +88,6 @@ export class HalfPlaneSceneModel extends SceneModel {
             }
     
             if (!isVertical && lineModel.type !== "Circle") {
-                console.log(
-                    `[HalfPlaneSceneModel:update] switching lineId=${lineModel.id} to Circle`
-                );
                 const newModel = HalfPlaneSemiCircleModel.create(
                     lineModel.pointModel1,
                     lineModel.pointModel2,

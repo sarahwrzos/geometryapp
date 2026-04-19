@@ -121,7 +121,6 @@
     };
 
     localStorage.setItem(name, JSON.stringify(data));
-    console.log("Saved construction:", name);
   }
 
   function loadConstruction(name, unitCircleCenter, unitCircleRadius) {
@@ -161,7 +160,6 @@
       sceneView.lineViews.push(lineView);
     });
 
-    console.log("Loaded construction:", name);
   }
 
   function switchToDisk() {

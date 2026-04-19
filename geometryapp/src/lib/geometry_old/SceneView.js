@@ -63,7 +63,6 @@ export class SceneView {
     switchModel(newType) {
         //todo apply clip again
         if (this.sceneModel.sceneType === newType) return;
-        console.log("new type", newType);
         // Remove all visuals
         this.baseElement.remove();
 
@@ -76,7 +75,6 @@ export class SceneView {
         // transform points
         this.sceneModel.points.forEach(p => {
             if (newType === "HalfPlane") {
-                console.log("switching to half plane");
                 p.transformDiskToHalfPlane();
             } else {
                 p.transformHalfPlaneToDisk();

@@ -54,7 +54,7 @@
 </script>
 
 <svelte:head>
-  <title>Geometry App</title>
+  <title>Hyperbolic Geometry</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 </svelte:head>
 

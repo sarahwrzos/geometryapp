@@ -10,6 +10,7 @@
   let controller;
   let axesVisible = false;
   let showHelp = false;
+  let showAbout = false;
 
   function addVerticalLine() {
     if (!controller) return;
@@ -76,6 +77,7 @@
         {axesVisible ? "Hide Axes" : "Show Axes"}
       </button>
       <button on:click={toggleHelp} class="help-btn" aria-label="Help">?</button>
+      <button on:click={() => (showAbout = !showAbout)} class="about-btn" aria-label="About">About</button>
 
       <!-- <button on:click={addVerticalLine}>Add Vertical Line (Debug)</button> -->
     </div>
@@ -99,6 +101,39 @@
         <li>Click on a point to drag the line around.</li>
         <li>Click on a line to remove or change colors.</li>
       </ul>
+    </div>
+  {/if}
+
+  {#if showAbout}
+    <div class="about-panel" role="dialog" aria-label="About">
+      <div class="about-header">
+        <h2>About</h2>
+        <button on:click={() => (showAbout = false)} class="close-btn" aria-label="Close">×</button>
+      </div>
+      
+      <div class="about-content">
+        <p>
+          This interactive tool allows you to explore hyperbolic geometry through the Poincaré Disc and Upper Half Plane models. 
+          Visualize how geometric objects transform between different representations of hyperbolic space.
+        </p>
+        
+        <div class="about-section">
+          <h3>Creator</h3>
+          <p><strong>[Sarah Wrzos]</strong></p>
+        </div>
+        
+        <div class="about-section">
+          <h3>Contact</h3>
+          <p>[contact [at] hyperbolic-geometry.com]</p>
+        </div>
+        
+        <div class="about-section">
+          <h3>Resources</h3>
+          <p>
+            <a href="https://github.com/sarahwrzos/geometryapp" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+          </p>
+        </div>
+      </div>
     </div>
   {/if}
 
@@ -242,6 +277,96 @@
   .help-panel li {
     margin: 0.35rem 0;
     line-height: 1.35;
+  }
+
+  .about-btn {
+    padding: 0.7rem 1.2rem;
+  }
+
+  .about-panel {
+    position: absolute;
+    top: 92px;
+    right: 20px;
+    width: min(420px, calc(100vw - 2rem));
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 14px;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.18);
+    padding: 0.9rem 1rem;
+    z-index: 1100;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .about-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .about-header h2 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .close-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    font-size: 1.5rem;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+  }
+
+  .close-btn:hover {
+    background: rgba(148, 163, 184, 0.12);
+    color: #1e293b;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .about-content {
+    color: #334155;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .about-content p {
+    margin: 0 0 1rem 0;
+  }
+
+  .about-section {
+    margin-top: 1.2rem;
+  }
+
+  .about-section h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+    color: #1e293b;
+  }
+
+  .about-section p {
+    margin: 0;
+  }
+
+  .about-content a {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+
+  .about-content a:hover {
+    color: #4f46e5;
+    text-decoration: underline;
   }
 
   .scene-shell {

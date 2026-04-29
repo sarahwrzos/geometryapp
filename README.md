@@ -1,4 +1,4 @@
-# Geometry App
+# Hyperbolic Geometry App
 
 ## Abstract
 

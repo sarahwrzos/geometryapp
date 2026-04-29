@@ -113,18 +113,25 @@
       
       <div class="about-content">
         <p>
-          This interactive tool allows you to explore hyperbolic geometry through the Poincaré Disc and Upper Half Plane models. 
-          Visualize how geometric objects transform between different representations of hyperbolic space.
+          Hyperbolic geometry is a non-Euclidean geometry in which the parallel postulate does not hold,
+          allowing infinitely many lines through a point to be parallel to another line. This counterintuitive
+          property challenges our Euclidean intuition and creates unique difficulties for visualization. To
+          address this, mathematicians use multiple models, each with distinct advantages and disadvantages.
+          The Poincaré disc provides a compact view of the entire space, while the upper half-plane extends
+          infinitely and is convenient for analytic calculations. Möbius transformations map geometric objects
+          between these models while preserving their structure. Visualizing these transformations and the
+          relationships between the models is important for exploring hyperbolic space because it helps develop
+          a deeper understanding of the geometry.
         </p>
         
         <div class="about-section">
           <h3>Creator</h3>
-          <p><strong>[Sarah Wrzos]</strong></p>
+          <p><strong>Sarah Wrzos</strong></p>
         </div>
         
         <div class="about-section">
-          <h3>Contact</h3>
-          <p>[contact [at] hyperbolic-geometry.com]</p>
+          <h3>Email</h3>
+          <p>contact [at] hyperbolic-geometry.com</p>
         </div>
         
         <div class="about-section">

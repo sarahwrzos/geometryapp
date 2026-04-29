@@ -32,6 +32,8 @@ The code follows a model-view-controller style split:
 - Views: render scenes, points, and lines in SVG
 - Controller: coordinates tools, scene state, syncing, and user actions
 
+Class diagram: [CLASSDIAGRAM.md](CLASSDIAGRAM.md)
+
 ### Main App Entry
 
 - UI page and toolbar: `geometryapp/src/routes/+page.svelte`

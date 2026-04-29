@@ -9,6 +9,7 @@
   let draw;
   let controller;
   let axesVisible = false;
+  let activeTool = null;
   let showHelp = false;
   let showAbout = false;
 
@@ -32,6 +33,14 @@
 
     const coords = pt.matrixTransform(draw.node.getScreenCTM().inverse());
     controller.handleClick(coords.x, coords.y);
+    activeTool = controller?.activeTool ?? null;
+  }
+
+  function selectTool(tool) {
+    if (!controller) return;
+
+    controller.setTool(tool);
+    activeTool = tool;
   }
 
   function toggleAxes() {
@@ -49,6 +58,7 @@
 
     controller = new AppController(draw, container);
     controller.init("halfPlane");
+    activeTool = controller.activeTool;
 
     draw.on("click", handleClick);
   });
@@ -68,8 +78,8 @@
     </div>
 
     <div class="button-group">
-      <button on:click={() => controller.setTool("point")}>Draw Point</button>
-      <button on:click={() => controller.setTool("hyperbolicLine")}>Draw Hyperbolic Line</button>
+      <button on:click={() => selectTool("point")} class:active={activeTool === "point"}>Draw Point</button>
+      <button on:click={() => selectTool("hyperbolicLine")} class:active={activeTool === "hyperbolicLine"}>Draw Hyperbolic Line</button>
       <button on:click={() => controller.syncTo()}>Sync</button>
       <button on:click={() => controller.switchSides()}>Switch Sides</button>
       <button on:click={() => controller.clear()}>Clear All</button>

@@ -50,7 +50,13 @@
   }
 
   function toggleHelp() {
+    showAbout = false;
     showHelp = !showHelp;
+  }
+
+  function toggleAbout() {
+    showHelp = false;
+    showAbout = !showAbout;
   }
 
   onMount(() => {
@@ -87,7 +93,7 @@
         {axesVisible ? "Hide Axes" : "Show Axes"}
       </button>
       <button on:click={toggleHelp} class="help-btn" aria-label="Help">?</button>
-      <button on:click={() => (showAbout = !showAbout)} class="about-btn" aria-label="About">About</button>
+      <button on:click={toggleAbout} class="about-btn" aria-label="About">About</button>
 
       <!-- <button on:click={addVerticalLine}>Add Vertical Line (Debug)</button> -->
     </div>

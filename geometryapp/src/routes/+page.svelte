@@ -109,7 +109,8 @@
         <li><strong>Clear All</strong>: Removes all drawn objects from the active scene.</li>
         <li><strong>Show Axes</strong>: Toggles guide axes in the scene views.</li>
         <li>Click on a point to drag the line around.</li>
-        <li>Click on a line to remove or change colors.</li>
+        <li>Click on a line to get options to remove or change colors.</li>
+        <li>Click on a point to get options to remove. Only points not linked to any lines can be removed.</li>
       </ul>
     </div>
   {/if}

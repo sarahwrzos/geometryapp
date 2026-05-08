@@ -37,6 +37,47 @@ export class AppController {
             .forEach(b => b.remove());
     }
 
+    makePointActions(pointView) {
+
+        if (!pointView.element) return;
+
+        pointView.element.on("click", (e) => {
+
+            e.stopPropagation();
+
+            this.removeLineActionButtons();
+
+            const pointModel = pointView.model;
+            const sceneModel = pointView.sceneView?.sceneModel;
+
+            if (!sceneModel) return;
+
+            const hasAttachedLine = sceneModel.lineModels.some(
+                line => line.pointModel1 === pointModel || line.pointModel2 === pointModel
+            );
+
+            if (hasAttachedLine) {
+                return;
+            }
+
+            const removeBtn = document.createElement("button");
+
+            removeBtn.textContent = "Remove";
+            removeBtn.classList.add("line-action");
+
+            removeBtn.style.position = "absolute";
+            removeBtn.style.top = `${e.clientY}px`;
+            removeBtn.style.left = `${e.clientX}px`;
+
+            removeBtn.onclick = () => {
+                sceneModel.removePoint(pointModel);
+                this.removeLineActionButtons();
+            };
+
+            document.body.appendChild(removeBtn);
+        });
+    }
+
     init(sceneType) {
 
         let sceneModel;
@@ -119,6 +160,7 @@ export class AppController {
             PointView.createDraggable(mathPoint, this.currentSceneView);
 
         this.currentSceneView.pointViews.push(pointView);
+        this.makePointActions(pointView);
 
         this.currentSceneView.updateClip();  
 
@@ -246,6 +288,7 @@ export class AppController {
         model.pointModels.forEach(p => {
             const pointView = PointView.createDraggable(p, view);
             view.pointViews.push(pointView);
+            this.makePointActions(pointView);
         });
 
         // Rebuild all lines
@@ -395,6 +438,7 @@ export class AppController {
         newLeftModel.pointModels.forEach(p => {
             const pointView = PointView.createDraggable(p, newLeftView);
             newLeftView.pointViews.push(pointView);
+            this.makePointActions(pointView);
         });
 
         newLeftView.update();

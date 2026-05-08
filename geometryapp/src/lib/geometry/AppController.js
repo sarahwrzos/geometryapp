@@ -129,7 +129,7 @@ export class AppController {
 
         if (!lineView.element) return;
 
-        const sceneView = this.currentSceneView;
+        const sceneView = lineView.sceneView;
 
         lineView.element.on("click", (e) => {
 

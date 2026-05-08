@@ -73,7 +73,7 @@
   <header class="toolbar">
     <div class="brand">
       <!-- <div class="brand-kicker">Hyperbolic Geometry</div> -->
-      <h1>Hyperbolic Geometry Lab</h1>
+      <h1>Hyperbolic Geometry Web App</h1>
       <p>See the transformation of lines across the Poincare Disc and Upper Half Plane models</p>
     </div>
 

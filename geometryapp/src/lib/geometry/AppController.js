@@ -238,7 +238,12 @@ export class AppController {
         if (!this.currentSceneView) return;
 
         this.currentSceneView.sceneModel.clearAll();
-        //this.currentSceneView.removeScene();
+
+        if (this.secondarySceneView) {
+            this.secondarySceneView.sceneModel.clearAll();
+        }
+
+        this.removeLineActionButtons();
     }
 
     setDiscAxesVisible(visible) {
